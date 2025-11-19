@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 
 import "./styles.css";
 import { Link } from "react-router-dom";
 import AdvancedListElement from "./AdvancedListElement";
+import { useQuery } from "@tanstack/react-query";
+import { getUserList } from "../../api/api";
 
 
 // the simple list element
@@ -20,23 +21,18 @@ function SimpleListElement({ id, first_name, last_name }) {
 
 
 function UserList({ advancedFeatures }) {
-  const [users, setUsers] = useState([]);
 
   // fetch the user list
-  useEffect(() => {
-    let response = axios.get("http://localhost:3001/user/list");
+  const { isPending, isError, data: users, error } = useQuery({
+    queryKey: ["userList"],
+    queryFn: getUserList
+  })
 
-    response
-      .catch((err) => {
-        console.error(err.response.data);
-      })
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch(() => {
-        console.log("An error occurred while setting the user list");
-      });
-  }, []);
+  // check the state of the promise
+  if (isPending) return <>Loading...</>;
+  if (isError)
+    return <>An error occurred while fetching the database: {error.message}</>;
+
 
   // decide which List Element type to render
   const ListElement = (advancedFeatures) ? AdvancedListElement : SimpleListElement;

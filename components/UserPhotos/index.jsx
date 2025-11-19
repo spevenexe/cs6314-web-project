@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from "prop-types";
 
@@ -7,7 +7,8 @@ import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import SimplePhotos from "./SimplePhotos";
 import AdvancedPhotos from "./AdvancedPhotos";
-import { getPhotos, setUserContext } from "../../api/api";
+import { getPhotos, getUser } from "../../api/api";
+import { useQuery } from "@tanstack/react-query";
 
 function UserPhotos({
   userId,
@@ -16,29 +17,48 @@ function UserPhotos({
   advancedFeatures,
   setAdvancedFeatures,
 }) {
-  const [photos, setPhotos] = useState([]);
-
-  // set the context of the top bar
-  useEffect(() => {
-    setUserContext(userId, setContext, "photo");
-  }, [userId]);
-
-  // Fetch photos belonging to our current user
-  useEffect(() => {
-    getPhotos(userId)
-      .then(({ ok, photosData }) => {
-        if (!ok) return;
-        setPhotos(photosData);
-      })
-      .catch(() => {
-        console.error("An error occurred while fetching the user photos");
-      });
-  }, [userId]);
-
   // If a photo parameter was passed in, we are presumably in the "Advanced" mode
   useEffect(() => {
     if (photoId && !advancedFeatures) setAdvancedFeatures(true);
   }, [photoId]);
+
+  // set the context of the top bar
+  const {
+    isPending: isUserPending,
+    isError: isUserError,
+    error: userError,
+  } = useQuery({
+    queryKey: ["userContext"],
+    queryFn: () =>
+      getUser(userId).then((userData) => {
+        const name = `${userData.first_name} ${userData.last_name}`;
+        const _pageType = "photo";
+        const context = {
+          userId: userData._id,
+          name: name,
+          pageType: _pageType,
+        };
+        setContext(context);
+        return userData;
+      }),
+  });
+
+  const {
+    isPending: isPhotosPending,
+    isError: isPhotosError,
+    data: photos,
+    error: photosError,
+  } = useQuery({
+    queryKey: ["userPhotos", userId],
+    queryFn: () => getPhotos(userId),
+  });
+
+  // check the state of the promise
+  if (isUserPending || isPhotosPending) return <>Loading...</>;
+  if (isUserError)
+    return <>An error occurred while fetching user data: {userError.message}</>;
+  if (isPhotosError)
+    return <>An error occurred while fetching photos: {photosError.message}</>;
 
   if (!advancedFeatures) {
     return (

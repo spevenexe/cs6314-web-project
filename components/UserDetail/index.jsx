@@ -1,35 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from "prop-types";
 import { Divider, Typography } from "@mui/material";
 
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
-import { setUserContext } from "../../api/api";
+import { getUser, setUserContext } from "../../api/api";
+import { useQuery } from "@tanstack/react-query";
 
 function UserDetail({ userId, setContext }) {
-  const [user, setUserData] = useState({});
+  // fetch the user details
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["userContext", userId],
+    queryFn: () =>
+      getUser(userId).then((userData) => {
+        const name = `${userData.first_name} ${userData.last_name}`;
+        const _pageType = "detail";
+        const context = {
+          userId: userData._id,
+          name: name,
+          pageType: _pageType,
+        };
+        setContext(context);
+        return userData;
+      }),
+  });
 
-  // set the context of the top bar and set the user details
-  useEffect(() => {
-    setUserContext(userId, setContext, "detail").then((userData) => {
-      setUserData(userData);
-    });
-  }, [userId]);
+  if (isPending) return <>Loading...</>;
+  if (isError)
+    return <>An error occurred while fetching the database: {error.message}</>;
 
   return (
     <>
       <ButtonSwap userId={userId} pageType={"detail"} />
       <div>
         <Typography variant="h2">
-          {user?.first_name} {user?.last_name}
+          {data?.first_name} {data?.last_name}
         </Typography>
         <Typography variant="subtitle1">
-          <b>Location:</b> {user?.location}. <b>Occupation:</b> {user?.occupation}
+          <b>Location:</b> {data?.location}. <b>Occupation:</b>{" "}
+          {data?.occupation}
         </Typography>
         <Divider />
         <Typography sx={{ my: 5 }} variant="body1">
-          {user?.description}
+          {data?.description}
         </Typography>
       </div>
     </>
