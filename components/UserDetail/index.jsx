@@ -1,30 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from "prop-types";
 import { Divider, Typography } from "@mui/material";
+import { PageType } from "../../api/lib";
+import { usePageStore } from "../../api/store";
 
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import { getUser, setUserContext } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 
-function UserDetail({ userId, setContext }) {
+function UserDetail({ userId }) {
+
   // fetch the user details
   const { isPending, isError, data, error } = useQuery({
-    queryKey: ["userContext", userId],
+    queryKey: ["userDetail", userId],
     queryFn: () =>
-      getUser(userId).then((userData) => {
-        const name = `${userData.first_name} ${userData.last_name}`;
-        const _pageType = "detail";
-        const context = {
-          userId: userData._id,
-          name: name,
-          pageType: _pageType,
-        };
-        setContext(context);
-        return userData;
-      }),
+      getUser(userId)
   });
+
+  // update user detail context
+  const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);
+  useEffect(() => {UpdatePageStore(userId,PageType.DETAIL);}, [userId]);
+  
 
   if (isPending) return <>Loading...</>;
   if (isError)

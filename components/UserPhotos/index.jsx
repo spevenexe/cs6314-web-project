@@ -10,6 +10,9 @@ import AdvancedPhotos from "./AdvancedPhotos";
 import { getPhotos, getUser } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 
+import { usePageStore } from "../../api/store";
+import { PageType } from "../../api/lib";
+
 function UserPhotos({
   userId,
   photoId,
@@ -17,6 +20,7 @@ function UserPhotos({
   advancedFeatures,
   setAdvancedFeatures,
 }) {
+
   // If a photo parameter was passed in, we are presumably in the "Advanced" mode
   useEffect(() => {
     if (photoId && !advancedFeatures) setAdvancedFeatures(true);
@@ -30,18 +34,12 @@ function UserPhotos({
   } = useQuery({
     queryKey: ["userContext"],
     queryFn: () =>
-      getUser(userId).then((userData) => {
-        const name = `${userData.first_name} ${userData.last_name}`;
-        const _pageType = "photo";
-        const context = {
-          userId: userData._id,
-          name: name,
-          pageType: _pageType,
-        };
-        setContext(context);
-        return userData;
-      }),
+      getUser(userId)
   });
+  
+  // update photo context
+  const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);
+  useEffect(() => {UpdatePageStore(userId,PageType.PHOTO);}, [userId]);
 
   const {
     isPending: isPhotosPending,
