@@ -46,8 +46,8 @@ function TopBar({ userId, name, pageType, advancedFeatures, setAdvancedFeatures 
     setAdvancedFeatures(checked);
   };
 
-  if (isPending) return <>Loading...</>;
-  if (isError) {
+  if (isPending && uid) return <>Loading...</>;
+  if (isError && uid) {
     return (
       <>An error occurred while fetching the user: {error.message}</>
     );

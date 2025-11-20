@@ -30,8 +30,7 @@ export function setUserContext(userId, setContext, pageType) {
       setContext(context);
       return userData;
     })
-    .catch(() =>
-      console.error(`An error occurred while fetching user data for ${userId}`)
+    .catch(() => console.error(`An error occurred while fetching user data for ${userId}`)
     );
 }
 
@@ -41,10 +40,12 @@ export function setUserContext(userId, setContext, pageType) {
  * @returns
  */
 export async function getUser(userId) {
+  // we do the error check here to prevent useQuery from constantly trying to re-fetch
+  if (!userId) throw new Error("No ID supplied");
+
   const response = await axios.get(`http://localhost:3001/user/${userId}`);
 
-  if (response.status != 200)
-    throw new Error(`error fetching user ${response.data}`);
+  if (response.status !== 200) throw new Error(`error fetching user ${response.data}`);
 
   return response.data;
 }
@@ -56,8 +57,7 @@ export async function getUser(userId) {
 export async function getUserList() {
   const response = await axios.get("http://localhost:3001/user/list");
 
-  if (response.status != 200)
-    throw new Error(`error fetching user ${response.data}`);
+  if (response.status !== 200) throw new Error(`error fetching user ${response.data}`);
 
   return response.data;
 }
@@ -72,10 +72,11 @@ export async function getPhotos(userId) {
     `http://localhost:3001/photosOfUser/${userId}`
   );
 
-  if (response.status != 200)
+  if (response.status !== 200) {
     throw new Error(
       `An error occurred while fetching the photos: ${response.data}`
     );
+  }
 
   return response.data;
 }
@@ -90,10 +91,11 @@ export async function getComments(userId) {
     `http://localhost:3001/commentsOfUser/${userId}`
   );
 
-  if (response.status != 200)
+  if (response.status !== 200) {
     throw new Error(
       `An error occurred while fetching the photos: ${response.data}`
     );
+  }
 
   return response.data;
 }
