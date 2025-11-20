@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { List, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import UserCommentLink from "./UserCommentLink";
-import {
-  getComments,
-  getUser,
-} from "../../api/api";
-import { useQuery } from "@tanstack/react-query";
+import { getComments} from "../../api/api";
+import { usePageStore } from "../../api/store";
+import { PageType } from "../../api/lib";
 
-function UserComments({ userId, setContext, advancedFeatures }) {
+function UserComments({ userId, advancedFeatures }) {
+  const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);
+  // const {UpdatePageStore} = usePageStore();
+  
   // fetch comments
   const {
     isPending: isCommentsPending,
@@ -22,36 +24,17 @@ function UserComments({ userId, setContext, advancedFeatures }) {
   });
 
   // update the topbar context
-  const {
-    isPending: isUserPending,
-    isError: isUserError,
-    data: userData,
-    error: userError,
-  } = useQuery({
-    queryKey: ["userContext", userId],
-    queryFn: () =>
-      getUser(userId).then((userData) => {
-        const name = `${userData.first_name} ${userData.last_name}`;
-        const _pageType = "comment";
-        const context = {
-          userId: userData._id,
-          name: name,
-          pageType: _pageType,
-        };
-        setContext(context);
-        return userData;
-      }),
-  });
+  useEffect(() => {UpdatePageStore(userId,PageType.COMMENT);}, [userId]);
+  // useEffect(() => {usePageStore.setState({userId:userId,pageType:PageType.COMMENT});}, [userId]);
 
   // check the state of the promise
-  if (isCommentsPending || isUserPending) return <>Loading...</>;
-  if (isCommentsError)
+  if (isCommentsPending) return <>Loading...</>;
+  if (isCommentsError) {
     return (
       <>An error occurred while fetching comments: {commentsError.message}</>
     );
-  if (isUserError)
-    return <>An error occurred while fetching user data: {userError.message}</>;
-
+  }
+  
   if (!advancedFeatures) {
     return (
       <Typography variant="h5">
