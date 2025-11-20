@@ -5,12 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import "./styles.css";
 import UserCommentLink from "./UserCommentLink";
 import { getComments} from "../../api/api";
-import { usePageStore } from "../../api/store";
+import { useAdvancedFeature, usePageStore } from "../../api/store";
 import { PageType } from "../../api/lib";
 
-function UserComments({ userId, advancedFeatures }) {
+function UserComments({ userId }) {
   const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);
-  // const {UpdatePageStore} = usePageStore();
+  const {advancedEnabled} = useAdvancedFeature();
   
   // fetch comments
   const {
@@ -35,7 +35,7 @@ function UserComments({ userId, advancedFeatures }) {
     );
   }
   
-  if (!advancedFeatures) {
+  if (!advancedEnabled) {
     return (
       <Typography variant="h5">
         This page is only available when &quot;Advanced Features&quot; is

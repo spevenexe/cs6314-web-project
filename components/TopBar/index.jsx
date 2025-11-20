@@ -12,15 +12,16 @@ import { useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
-import { usePageStore } from "../../api/store";
+import { useAdvancedFeature, usePageStore } from "../../api/store";
 import { getUser } from "../../api/api";
 import { PageType } from "../../api/lib";
 
 // Shows the status of page: which user we are looking at, what page type, whether advanced mode is activated
-function TopBar({ advancedFeatures, setAdvancedFeatures }) {
+function TopBar() {
   const navigate = useNavigate();
 
   const {userId:uid,pageType:pType} = usePageStore();
+  const {advancedEnabled, setAdvancedFeatures} = useAdvancedFeature();
 
   // fetch the user name
   const {
@@ -70,7 +71,7 @@ function TopBar({ advancedFeatures, setAdvancedFeatures }) {
             <FormControlLabel
               control={(
                 <Checkbox
-                  checked={advancedFeatures}
+                  checked={advancedEnabled}
                   onChange={handleChange}
                   sx={{
                     color: grey[400],

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
 import { Grid, Paper } from "@mui/material";
@@ -23,54 +23,38 @@ function UserDetailRoute() {
     return <UserDetail userId={userId}/>;
 }
 
-function UserPhotosRoute({
-    advancedFeatures,
-    setAdvancedFeatures,
-}) {
+function UserPhotosRoute() {
     const { userId, photoId } = useParams();
     return (
         <UserPhotos
             userId={userId}
             photoId={photoId}
-            advancedFeatures={advancedFeatures}
-            setAdvancedFeatures={setAdvancedFeatures}
         />
     );
 }
 
-function UserCommentsRoute({
-    advancedFeatures,
-    setAdvancedFeatures,
-}) {
+function UserCommentsRoute() {
     const { userId } = useParams();
     return (
         <UserComments
             userId={userId}
-            advancedFeatures={advancedFeatures}
-            setAdvancedFeatures={setAdvancedFeatures}
         />
     );
 }
 
 function PhotoShare() {
-    // store the context for the TopBar in the parent object. Then, we pass the setter function to subcomponents, while passing context to TopBar
-    const [advancedFeatures, setAdvancedFeatures] = useState(false); //determiner of which mode to use
-
     return (
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <div>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TopBar
-                                advancedFeatures={advancedFeatures}
-                                setAdvancedFeatures={setAdvancedFeatures}
-                            />
+                            <TopBar/>
                         </Grid>
                         <div className="main-topbar-buffer" />
                         <Grid item sm={3}>
                             <Paper className="main-grid-item">
-                                <UserList advancedFeatures={advancedFeatures} />
+                                <UserList/>
                             </Paper>
                         </Grid>
                         <Grid item sm={9}>
@@ -83,30 +67,21 @@ function PhotoShare() {
                                     <Route
                                         path="/photos/:userId"
                                         element={(
-                                            <UserPhotosRoute
-                                                advancedFeatures={advancedFeatures}
-                                                setAdvancedFeatures={setAdvancedFeatures}
-                                            />
+                                            <UserPhotosRoute/>
                                         )}
                                     />
                                     <Route
                                         // for "Advanced Features" photos are indexed by their ids, rather than a incremental index
                                         path="/photos/:userId/:photoId"
                                         element={(
-                                            <UserPhotosRoute
-                                                advancedFeatures={advancedFeatures}
-                                                setAdvancedFeatures={setAdvancedFeatures}
-                                            />
+                                            <UserPhotosRoute/>
                                         )}
                                     />
                                     {/* Route for the new view of user comments*/}
                                     <Route
                                         path="/comments/:userId"
                                         element={(
-                                            <UserCommentsRoute
-                                                advancedFeatures={advancedFeatures}
-                                                setAdvancedFeatures={setAdvancedFeatures}
-                                            />
+                                            <UserCommentsRoute/>
                                         )}
                                     />
                                     <Route path="/users" element={<UserList />} />

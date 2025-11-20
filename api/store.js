@@ -4,6 +4,9 @@
 import { create } from "zustand";
 import { PageType } from "./lib";
 
+/**
+ * Stores general context for the top bar to render
+ */
 export const usePageStore = create((set) => ({
   userId: "",
   pageType: PageType.DETAIL,
@@ -12,4 +15,11 @@ export const usePageStore = create((set) => ({
   UpdatePageType: (pageType) => set(() => ({ pageType: pageType })),
 }));
 
-export const usePhoto = create();
+/**
+ * Decides whether to include advanced features such as photo scrolling and comment viewing.
+ */
+export const useAdvancedFeature = create((set) => ({
+  advancedEnabled: false,
+  ToggleAdvancedFeatures: () => set((state) => ({ advancedEnabled: !state.advancedEnabled })),
+  setAdvancedFeatures: (val) => set(() => ({ advancedEnabled: val })),
+}));
