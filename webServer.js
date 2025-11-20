@@ -8,7 +8,8 @@
 import mongoose from "mongoose";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bluebird from "bluebird";
-import express from "express";
+import express, { json } from "express";
+import session from "express-session";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -35,6 +36,14 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+// project 3: add session management
+app.use(session({
+  secret: 'none',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(json());
 
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
@@ -228,6 +237,48 @@ app.get('/commentsOfUser/:id', async (request, response) => {
     return;
   }
   response.status(200).send(result);
+});
+
+/**
+ * Attempt to the log the user in via the post request
+ */
+app.post('/admin/login', async (request, response) => {
+  const { login_name } = request.body;
+
+  if (!login_name) {
+    response.status(400).send("No username provided.");
+  }
+
+  try {
+    const query = User.find({ login_name: login_name })
+      .select("_id")
+      .lean()
+      .exec();
+
+    const user = await query;
+    // if no user is matched, throw error
+    if (user.length === 0) throw new Error(`Account ${login_name} does not exist.`);
+    
+    const uid = user[0]._id;
+
+    // set the session
+    request.session.userId = uid; 
+
+    // respond with the required body
+    response.status(200).send(user[0]._id);
+  } catch (error) {
+    response.status(400).send(error.message);
+  }
+});
+
+app.post('/admin/logout', async (request, response) => {
+  if (!request.session.user){
+    response.status(400).send('No user currently logged in.');
+  }
+
+  request.session.destroy(() => {
+    response.redirect('/login-register');
+  });
 });
 
 const server = app.listen(portno, function () {
