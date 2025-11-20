@@ -5,36 +5,6 @@
 import axios from "axios";
 
 /**
- * Sets the context of the top bar page by querying the database on current user ID.
- * @param {number} userId
- * @param {Function} setContext the useState setter function for the context
- * @param {string} pageType a string literal that determines what should be displayed in the top bar.
- * @returns A promise that has been configured to set the context and return the userdata object from the server's response.
- */
-export function setUserContext(userId, setContext, pageType) {
-  let response = axios.get(`http://localhost:3001/user/${userId}`);
-
-  return response
-    .catch((err) => {
-      console.error(err.response.data);
-    })
-    .then((res) => {
-      let userData = res.data;
-      const name = `${userData.first_name} ${userData.last_name}`;
-      const _pageType = pageType;
-      const context = {
-        userId: userData._id,
-        name: name,
-        pageType: _pageType,
-      };
-      setContext(context);
-      return userData;
-    })
-    .catch(() => console.error(`An error occurred while fetching user data for ${userId}`)
-    );
-}
-
-/**
  * Get the data of the specified user.
  * @param {string} userId
  * @returns
