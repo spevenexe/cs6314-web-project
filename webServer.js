@@ -274,6 +274,7 @@ app.post('/admin/login', async (request, response) => {
 app.post('/admin/logout', async (request, response) => {
   if (!request.session.user){
     response.status(400).send('No user currently logged in.');
+    return;
   }
 
   request.session.destroy(() => {
