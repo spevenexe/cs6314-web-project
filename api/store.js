@@ -23,3 +23,8 @@ export const useAdvancedFeature = create((set) => ({
   ToggleAdvancedFeatures: () => set((state) => ({ advancedEnabled: !state.advancedEnabled })),
   setAdvancedFeatures: (val) => set(() => ({ advancedEnabled: val })),
 }));
+
+export const useLogin = create((set) => ({
+  token: "", // uid for now
+  setToken: (tok) => set(() => ({ token: tok })),
+}));

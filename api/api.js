@@ -69,3 +69,27 @@ export async function getComments(userId) {
 
   return response.data;
 }
+
+/**
+ * 
+ */
+export async function loginRequest({login_name}) {
+  const response = await axios.post(
+    `http://localhost:3001/admin/login`,
+    {login_name: login_name}
+  );
+  
+  if (response.status === 400) {
+    throw new Error(
+      `${response.data}`
+    );
+  }
+
+  if(response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to login: ${response.data}`
+    );
+  }
+
+  return response.data;
+}

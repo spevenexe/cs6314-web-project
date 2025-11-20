@@ -2,7 +2,8 @@ import React from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
 import { Grid, Paper } from "@mui/material";
-import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useParams, Navigate } from "react-router-dom";
+// import { redirect } from "react-router-dom";
 
 import {
     QueryClient,
@@ -15,12 +16,18 @@ import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
+import LoginRegister from "./components/LoginRegister";
+import { useLogin } from "./api/store";
 
 const queryClient = new QueryClient();
 
+function LoginRegisterRoute() {
+    return <LoginRegister />;
+}
+
 function UserDetailRoute() {
     const { userId } = useParams();
-    return <UserDetail userId={userId}/>;
+    return <UserDetail userId={userId} />;
 }
 
 function UserPhotosRoute() {
@@ -43,48 +50,53 @@ function UserCommentsRoute() {
 }
 
 function PhotoShare() {
+    const token = useLogin((state) => state.token);
+    const loggedIn = token;
     return (
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <div>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TopBar/>
+                            <TopBar />
                         </Grid>
                         <div className="main-topbar-buffer" />
                         <Grid item sm={3}>
                             <Paper className="main-grid-item">
-                                <UserList/>
+                                {loggedIn ? <UserList /> : <></>}
                             </Paper>
                         </Grid>
                         <Grid item sm={9}>
                             <Paper className="main-grid-item">
                                 <Routes>
-                                    <Route
-                                        path="/users/:userId"
-                                        element={<UserDetailRoute/>}
-                                    />
-                                    <Route
-                                        path="/photos/:userId"
-                                        element={(
-                                            <UserPhotosRoute/>
-                                        )}
-                                    />
-                                    <Route
-                                        // for "Advanced Features" photos are indexed by their ids, rather than a incremental index
-                                        path="/photos/:userId/:photoId"
-                                        element={(
-                                            <UserPhotosRoute/>
-                                        )}
-                                    />
-                                    {/* Route for the new view of user comments*/}
-                                    <Route
-                                        path="/comments/:userId"
-                                        element={(
-                                            <UserCommentsRoute/>
-                                        )}
-                                    />
-                                    <Route path="/users" element={<UserList />} />
+                                    <Route path="/login-register" element={loggedIn ?
+                                        <Navigate replace to={`/users/${token}`} />
+                                        : <LoginRegisterRoute />} />
+                                    <Route path="/users/:userId" element={loggedIn ?
+                                        <UserDetailRoute />
+                                        :
+                                        <Navigate replace to="/login-register" />
+                                    } />
+                                    <Route path={"/photos/:userId"} element={loggedIn ?
+                                        <UserPhotosRoute />
+                                        :
+                                        <Navigate replace to="/login-register" />
+                                    } />
+                                    <Route path={"/photos/:userId/:photoId"} element={loggedIn ?
+                                        <UserPhotosRoute />
+                                        :
+                                        <Navigate replace to="/login-register" />
+                                    } />
+                                    <Route path={"/comments/:userId"} element={loggedIn ?
+                                        <UserCommentsRoute />
+                                        :
+                                        <Navigate replace to="/login-register" />
+                                    } />
+                                    <Route path={"/users"} element={loggedIn ?
+                                        <UserList />
+                                        :
+                                        <Navigate replace to="/login-register" />
+                                    } />
                                 </Routes>
                             </Paper>
                         </Grid>

@@ -247,6 +247,7 @@ app.post('/admin/login', async (request, response) => {
 
   if (!login_name) {
     response.status(400).send("No username provided.");
+    return;
   }
 
   try {
