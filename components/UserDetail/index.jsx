@@ -7,7 +7,7 @@ import { usePageStore } from "../../api/store";
 
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
-import { getUser, setUserContext } from "../../api/api";
+import { getUser } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 
 function UserDetail({ userId }) {
@@ -50,7 +50,6 @@ function UserDetail({ userId }) {
 
 UserDetail.propTypes = {
   userId: PropTypes.string.isRequired,
-  setContext: PropTypes.func.isRequired,
 };
 
 export default UserDetail;

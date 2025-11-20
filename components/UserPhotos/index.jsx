@@ -16,7 +16,6 @@ import { PageType } from "../../api/lib";
 function UserPhotos({
   userId,
   photoId,
-  setContext,
   advancedFeatures,
   setAdvancedFeatures,
 }) {
@@ -77,7 +76,6 @@ function UserPhotos({
 
 UserPhotos.propTypes = {
   userId: PropTypes.string.isRequired,
-  setContext: PropTypes.func.isRequired,
 };
 
 export default UserPhotos;

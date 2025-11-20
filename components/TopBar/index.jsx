@@ -17,7 +17,7 @@ import { getUser } from "../../api/api";
 import { PageType } from "../../api/lib";
 
 // Shows the status of page: which user we are looking at, what page type, whether advanced mode is activated
-function TopBar({ userId, name, pageType, advancedFeatures, setAdvancedFeatures }) {
+function TopBar({ advancedFeatures, setAdvancedFeatures }) {
   const navigate = useNavigate();
 
   const {userId:uid,pageType:pType} = usePageStore();

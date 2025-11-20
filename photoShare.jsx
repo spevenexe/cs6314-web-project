@@ -18,13 +18,12 @@ import UserComments from "./components/UserComments";
 
 const queryClient = new QueryClient();
 
-function UserDetailRoute({ setContext }) {
+function UserDetailRoute() {
     const { userId } = useParams();
-    return <UserDetail userId={userId} setContext={setContext} />;
+    return <UserDetail userId={userId}/>;
 }
 
 function UserPhotosRoute({
-    setContext,
     advancedFeatures,
     setAdvancedFeatures,
 }) {
@@ -33,7 +32,6 @@ function UserPhotosRoute({
         <UserPhotos
             userId={userId}
             photoId={photoId}
-            setContext={setContext}
             advancedFeatures={advancedFeatures}
             setAdvancedFeatures={setAdvancedFeatures}
         />
@@ -41,7 +39,6 @@ function UserPhotosRoute({
 }
 
 function UserCommentsRoute({
-    setContext,
     advancedFeatures,
     setAdvancedFeatures,
 }) {
@@ -49,7 +46,6 @@ function UserCommentsRoute({
     return (
         <UserComments
             userId={userId}
-            setContext={setContext}
             advancedFeatures={advancedFeatures}
             setAdvancedFeatures={setAdvancedFeatures}
         />
@@ -58,7 +54,6 @@ function UserCommentsRoute({
 
 function PhotoShare() {
     // store the context for the TopBar in the parent object. Then, we pass the setter function to subcomponents, while passing context to TopBar
-    const [context, setContext] = useState({});
     const [advancedFeatures, setAdvancedFeatures] = useState(false); //determiner of which mode to use
 
     return (
@@ -68,9 +63,6 @@ function PhotoShare() {
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TopBar
-                                userId={context.userId}
-                                name={context.name}
-                                pageType={context.pageType}
                                 advancedFeatures={advancedFeatures}
                                 setAdvancedFeatures={setAdvancedFeatures}
                             />
@@ -86,13 +78,12 @@ function PhotoShare() {
                                 <Routes>
                                     <Route
                                         path="/users/:userId"
-                                        element={<UserDetailRoute setContext={setContext} />}
+                                        element={<UserDetailRoute/>}
                                     />
                                     <Route
                                         path="/photos/:userId"
                                         element={(
                                             <UserPhotosRoute
-                                                setContext={setContext}
                                                 advancedFeatures={advancedFeatures}
                                                 setAdvancedFeatures={setAdvancedFeatures}
                                             />
@@ -103,7 +94,6 @@ function PhotoShare() {
                                         path="/photos/:userId/:photoId"
                                         element={(
                                             <UserPhotosRoute
-                                                setContext={setContext}
                                                 advancedFeatures={advancedFeatures}
                                                 setAdvancedFeatures={setAdvancedFeatures}
                                             />
@@ -114,7 +104,6 @@ function PhotoShare() {
                                         path="/comments/:userId"
                                         element={(
                                             <UserCommentsRoute
-                                                setContext={setContext}
                                                 advancedFeatures={advancedFeatures}
                                                 setAdvancedFeatures={setAdvancedFeatures}
                                             />
