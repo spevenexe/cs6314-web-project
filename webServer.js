@@ -25,9 +25,12 @@ import SchemaInfo from "./schema/schemaInfo.js";
 const portno = 3001; // Port number to use
 const app = express();
 
+app.use(express.json());
+
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000' || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   if (req.method === 'OPTIONS') {
@@ -128,7 +131,6 @@ async function isAuthenticated(request, response, next) {
     return;
   }
   
-  console.log(`id: ${user._id}`);
   const query = await User.findById(user._id)
     .select("_id")
     .lean()
