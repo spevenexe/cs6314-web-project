@@ -6,15 +6,18 @@ import {
   FormGroup,
   Toolbar,
   Typography,
+  Button,
 } from "@mui/material";
 import { grey } from '@mui/material/colors';
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
 import { useAdvancedFeature, usePageStore } from "../../api/store";
-import { getUser } from "../../api/api";
+import { getUser, logoutRequest } from "../../api/api";
 import { PageType } from "../../api/lib";
+import { useLogin } from "../../api/store";
+
 
 // Shows the status of page: which user we are looking at, what page type, whether advanced mode is activated
 function TopBar() {
@@ -35,6 +38,41 @@ function TopBar() {
         return `${userData.first_name} ${userData.last_name}`;
       }),
   });
+
+  const loginToken = useLogin((state) => state.token);
+  
+  const {
+    isPending: isPending_loggedUser,
+    isError: isError_loggedUser,
+    data: firstname_loggedUser, 
+    error: error_loggedUser,
+  } = useQuery({
+    queryKey: ["topbar_loggedUser", loginToken],
+    queryFn: () => getUser(loginToken).then((userData) => {
+      return userData.first_name;
+    })
+  });
+
+  if (isError_loggedUser && loginToken) {
+    return (
+      <>An error occurred while fetching the logged user: {error_loggedUser.message}</>
+    );
+  }
+
+  const loggedUserDisplay = loginToken ? `Hi ${firstname_loggedUser}` : "";
+  
+  const handleLog = () => {
+    if (!loginToken) {
+      navigate('/login-register');
+      return;
+    }
+    // const { status, isError, isLoading, error, mutate: logoutMutate } = useMutation({
+    //   mutationFn: logoutRequest,
+    //   on
+    // })
+
+    //TODO: add logoutRequest
+  }
 
   const handleChange = (event) => {
     const checked = event.target.checked;
@@ -64,7 +102,7 @@ function TopBar() {
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar className="toolbar-container">
         <Typography variant="h5" color="inherit">
-          Terrence Li
+          {(isPending_loggedUser && loginToken) ? "Loading..." : loggedUserDisplay}
         </Typography>
         <div className="topbar-checkbox-container">
           <FormGroup>
@@ -87,6 +125,14 @@ function TopBar() {
           <Typography variant="h5" color="inherit">
             {context}
           </Typography>
+          <Button
+            variant="contained"
+            color={loginToken ? "error" : "primary"}
+            sx={{ ml: 2 }}
+            onClick={handleLog}
+          >
+            {loginToken ? "Logout" : "Login"}
+          </Button>
         </div>
       </Toolbar>
     </AppBar>

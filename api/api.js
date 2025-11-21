@@ -76,7 +76,7 @@ export async function getComments(userId) {
 }
 
 /**
- * 
+ * //TODO
  */
 export async function loginRequest({ login_name }) {
   const response = await api.post(
@@ -93,6 +93,23 @@ export async function loginRequest({ login_name }) {
   if (response.status !== 200) {
     throw new Error(
       `An error occurred while trying to login: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
+ * //TODO
+ */
+export async function logoutRequest() {
+  const response = await api.post(
+    `/admin/logout`
+  );
+
+  if (response.status === 400) {
+    throw new Error(
+      `An error occurred while trying to logout: ${response.data}`
     );
   }
 
