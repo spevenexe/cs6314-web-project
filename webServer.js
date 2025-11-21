@@ -42,6 +42,10 @@ app.use(session({
   secret: 'none',
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    secure: false, // because we are on localhost
+    sameSite: "lax",
+  }
 }));
 app.use(json());
 
@@ -67,7 +71,6 @@ app.get("/", function (request, response) {
  * /test/info - Returns the SchemaInfo object of the database in JSON format.
  *              This is good for testing connectivity with MongoDB.
  */
-
 app.get('/test/info', (request, response) => {
   const query = SchemaInfo.find({});
   query
@@ -117,10 +120,31 @@ app.get('/test/counts', (request, response) => {
     );
 });
 
+async function isAuthenticated(request, response, next) {
+  const user = request.session.user;
+  
+  if (user == null) {
+    response.status(401).send("Only logged users are authorized to access this.");
+    return;
+  }
+  
+  console.log(`id: ${user._id}`);
+  const query = await User.findById(user._id)
+    .select("_id")
+    .lean()
+    .exec();
+
+  if (query.length === 0) {
+    response.status(401).send("Only logged users are authorized to access this.");
+  } else {
+    next();
+  }
+}
+
 /**
  * URL /user/list - Returns all the User objects.
  */
-app.get('/user/list', (request, response) => {
+app.get('/user/list', isAuthenticated, (request, response) => {
   User.find({})
     // select only what is needed
     .select("_id first_name last_name")
@@ -142,7 +166,7 @@ app.get('/user/list', (request, response) => {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-app.get('/user/:id', (request, response) => {
+app.get('/user/:id', isAuthenticated, (request, response) => {
   const id = request.params.id;
 
   User.findById(id)
@@ -168,7 +192,7 @@ app.get('/user/:id', (request, response) => {
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get('/photosOfUser/:id', async (request, response) => {
+app.get('/photosOfUser/:id', isAuthenticated, async (request, response) => {
   const id = request.params.id;
   const query = Photo.find({ user_id: id })
     .select("_id user_id comments file_name date_time")
@@ -199,7 +223,7 @@ app.get('/photosOfUser/:id', async (request, response) => {
   response.status(200).send(result);
 });
 
-app.get('/commentsOfUser/:id', async (request, response) => {
+app.get('/commentsOfUser/:id', isAuthenticated, async (request, response) => {
   const id = request.params.id;
   const query = Photo.find()
     .select("_id user_id comments file_name date_time")
@@ -242,7 +266,7 @@ app.get('/commentsOfUser/:id', async (request, response) => {
 /**
  * Attempt to the log the user in via the post request
  */
-app.post('/admin/login', async (request, response) => {
+app.post('/admin/login', async (request, response, next) => {
   const { login_name } = request.body;
 
   if (!login_name) {
@@ -259,21 +283,34 @@ app.post('/admin/login', async (request, response) => {
     const user = await query;
     // if no user is matched, throw error
     if (user.length === 0) throw new Error(`Account ${login_name} does not exist.`);
-    
-    const uid = user[0]._id;
+
+    const uid = user[0]._id.toString();
 
     // set the session
-    request.session.userId = uid; 
+    // request.session.user = { _id: uid };
+    // console.log(request.session.user);
 
-    // respond with the required body
-    response.status(200).send(user[0]._id);
+    request.session.regenerate(err1 => {
+      if (err1) return next(err1);
+
+      request.session.user = { _id: uid };
+
+      return request.session.save(err2 => {
+        if (err2) return next(err2);
+
+        return response.status(200).send({ _id: uid });
+      });
+    });
+
+
+    // response.status(200).send({ _id: uid });
   } catch (error) {
     response.status(400).send(error.message);
   }
 });
 
 app.post('/admin/logout', async (request, response) => {
-  if (!request.session.user){
+  if (!request.session.user) {
     response.status(400).send('No user currently logged in.');
     return;
   }

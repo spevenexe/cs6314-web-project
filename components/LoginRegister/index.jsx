@@ -18,9 +18,9 @@ export default function LoginRegister() {
   const setToken = useLogin((state) => state.setToken);
   const { status, isError, isLoading, error, mutate: loginMutate} = useMutation({
     mutationFn: loginRequest,
-    onSuccess: (user) => {
-      setToken(user);
-      navigate(`/users/${user}`);
+    onSuccess: ({_id}) => {
+      setToken(_id);
+      navigate(`/users/${_id}`);
     },
   });
 
