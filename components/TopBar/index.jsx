@@ -63,6 +63,7 @@ function TopBar() {
   });
 
   if (isError_loggedUser && loginToken) {
+    console.error("Login Token:", loginToken);
     return (
       <>An error occurred while fetching the logged user: {error_loggedUser.message}</>
     );
@@ -76,7 +77,7 @@ function TopBar() {
       return;
     }
     
-    usePageStore.getState().UpdatePageType(PageType.LOGIN);
+    usePageStore.getState().UpdatePageStore("", PageType.LOGIN);
     logoutMutate.mutate();
   }
 
@@ -93,6 +94,7 @@ function TopBar() {
 
   if (isPending && uid) return <>Loading...</>;
   if (isError && uid) {
+    console.error("UID:", uid);
     return (
       <>An error occurred while fetching the user: {error.message}</>
     );
