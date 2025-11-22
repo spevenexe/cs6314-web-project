@@ -322,7 +322,6 @@ app.post('/admin/logout', async (request, response) => {
       return response.status(500).send(`Error logging out: ${err}`)
     }
 
-    // response.redirect('/login-register');
     response.status(200).send('Successfullly logged out');
   });
 });

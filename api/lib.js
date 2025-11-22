@@ -7,7 +7,6 @@ export class PageType {
   static get COMMENT() { return 'comment'; }
   static get DETAIL() { return 'detail'; }
   static get PHOTO() { return 'photo'; }
-  static get LOGIN() { return 'login'; }
 }
 
 /**

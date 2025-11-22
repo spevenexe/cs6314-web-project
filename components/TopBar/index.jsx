@@ -69,7 +69,7 @@ function TopBar() {
     );
   }
 
-  const loggedUserDisplay = loginToken ? `Hi ${firstname_loggedUser}` : "";
+  const loggedUserDisplay = loginToken ? `Hi ${firstname_loggedUser}` : "Please login";
   
   const handleLog = () => {
     if (!loginToken) {
@@ -77,7 +77,7 @@ function TopBar() {
       return;
     }
     
-    usePageStore.getState().UpdatePageStore("", PageType.LOGIN);
+    usePageStore.getState().UpdateID("");
     logoutMutate.mutate();
   }
 
@@ -102,10 +102,10 @@ function TopBar() {
 
   // top right context
   let context;
-  if (pType === PageType.DETAIL) context = userName;
+  if(!loginToken) context = "";
+  else if (pType === PageType.DETAIL) context = userName;
   else if (pType === PageType.PHOTO) context = `Photos of ${userName}`;
   else if (pType === PageType.COMMENT) context = `Comments of ${userName}`;
-  else if (pType === PageType.LOGIN) context = "";
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
