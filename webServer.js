@@ -317,8 +317,12 @@ app.post('/admin/logout', async (request, response) => {
     return;
   }
 
-  request.session.destroy(() => {
-    response.redirect('/login-register');
+  request.session.destroy((err) => {
+    if (err) {
+      return response.status(500).send(`Error logging out: ${err}`)
+    }
+
+    // response.redirect('/login-register');
     response.status(200).send('Successfullly logged out');
   });
 });

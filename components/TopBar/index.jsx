@@ -40,7 +40,16 @@ function TopBar() {
   });
 
   const loginToken = useLogin((state) => state.token);
-  
+  const logoutMutate = useMutation({
+    mutationFn: logoutRequest,
+    onSuccess: () => {
+      useLogin.getState().setToken("");
+      navigate('/login-register');
+    },
+    onError: (err) => {
+      console.error("Error logging out: ", err)
+    }
+  })
   const {
     isPending: isPending_loggedUser,
     isError: isError_loggedUser,
@@ -66,12 +75,9 @@ function TopBar() {
       navigate('/login-register');
       return;
     }
-    // const { status, isError, isLoading, error, mutate: logoutMutate } = useMutation({
-    //   mutationFn: logoutRequest,
-    //   on
-    // })
-
-    //TODO: add logoutRequest
+    
+    usePageStore.getState().UpdatePageType(PageType.LOGIN);
+    logoutMutate.mutate();
   }
 
   const handleChange = (event) => {
@@ -97,6 +103,7 @@ function TopBar() {
   if (pType === PageType.DETAIL) context = userName;
   else if (pType === PageType.PHOTO) context = `Photos of ${userName}`;
   else if (pType === PageType.COMMENT) context = `Comments of ${userName}`;
+  else if (pType === PageType.LOGIN) context = "";
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
