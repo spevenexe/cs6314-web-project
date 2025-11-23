@@ -266,6 +266,33 @@ app.get('/commentsOfUser/:id', isAuthenticated, async (request, response) => {
 });
 
 /**
+ * URL /commentsOfPhoto/:photo_id - adds comment to photo's comments
+ */
+app.post('/commentsOfPhoto/:photo_id', isAuthenticated, async (request, response) => {
+  const { comment } = request.body;
+  if (!comment) {
+    return response.status(400).send("No comment provided.");
+  }
+  
+  const photo_id = request.params.photo_id;
+  const photo = await Photo.findById(photo_id);
+  if (!photo) {
+    return response.status(404).send(`No photo with id ${photo_id} found`);
+  }
+
+  const newComment = {
+    comment: comment,
+    date_time: new Date(),
+    user_id: request.session.user,
+  };
+
+  photo.comments.push(newComment);
+  await photo.save();
+
+  return response.status(200).send(newComment);
+});
+
+/**
  * Attempt to the log the user in via the post request
  */
 app.post('/admin/login', async (request, response, next) => {

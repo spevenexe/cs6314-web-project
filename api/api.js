@@ -76,6 +76,32 @@ export async function getComments(userId) {
 }
 
 /**
+ * Adds comment to comments of photo photo_id
+ * @param {string} photo_id
+ * @param {{ comment: string }} comment
+ */
+export async function postComment(photo_id, { comment }) {
+  const response = await api.post(
+    `/commentsOfPhoto/${photo_id}`,
+    { comment: comment },
+  );
+
+  if (response.status === 400) {
+    throw new Error(
+      `${response.data}`
+    );
+  }
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to post comment: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
  * //TODO
  */
 export async function loginRequest({ login_name }) {
