@@ -13,18 +13,15 @@ import session from "express-session";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-// ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
-// import models from "./modelData/photoApp.js";
-
 // Load the Mongoose schema for User, Photo, and SchemaInfo
-// ToDO - Your submission will use code below, so make sure to uncomment this line for tests and before submission!
 import User from "./schema/user.js";
-import Photo from "./schema/photo.js";
-import SchemaInfo from "./schema/schemaInfo.js";
 
-import fs from "fs";
-import multer from "multer";
-const processFormBody = multer({ storage: multer.memoryStorage() }).single('uploadedphoto');
+// routers
+import testRouter from "./routes/testRoute.js";
+import userRouter from "./routes/userRoute.js";
+import photoRouter from "./routes/photoRoute.js";
+import commentRouter from "./routes/commentRouter.js";
+import adminRouter from "./routes/adminRoute.js";
 
 const portno = 3001; // Port number to use
 const app = express();
