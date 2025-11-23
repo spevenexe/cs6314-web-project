@@ -2,31 +2,29 @@ import React, { useEffect } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from "prop-types";
 import { Divider, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+
 import { PageType } from "../../api/lib";
 import { usePageStore } from "../../api/store";
-
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import { getUser } from "../../api/api";
-import { useQuery } from "@tanstack/react-query";
 
 function UserDetail({ userId }) {
-
   // fetch the user details
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["userDetail", userId],
-    queryFn: () =>
-      getUser(userId)
+    queryFn: () => getUser(userId),
   });
 
   // update user detail context
   const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);
-  useEffect(() => {UpdatePageStore(userId,PageType.DETAIL);}, [userId]);
-  
+  useEffect(() => {
+    UpdatePageStore(userId, PageType.DETAIL);
+  }, [userId]);
 
   if (isPending) return <>Loading...</>;
-  if (isError)
-    return <>An error occurred while fetching the database: {error.message}</>;
+  if (isError) return <>An error occurred while fetching the database: {error.message}</>;
 
   return (
     <>

@@ -2,13 +2,16 @@ import React from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
 import { Grid, Paper } from "@mui/material";
-import { BrowserRouter, Route, Routes, useParams, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useParams,
+  Navigate,
+} from "react-router-dom";
 // import { redirect } from "react-router-dom";
 
-import {
-    QueryClient,
-    QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./styles/main.css";
 import TopBar from "./components/TopBar";
@@ -22,89 +25,112 @@ import { useLogin } from "./api/store";
 const queryClient = new QueryClient();
 
 function LoginRegisterRoute() {
-    return <LoginRegister />;
+  return <LoginRegister />;
 }
 
 function UserDetailRoute() {
-    const { userId } = useParams();
-    return <UserDetail userId={userId} />;
+  const { userId } = useParams();
+  return <UserDetail userId={userId} />;
 }
 
 function UserPhotosRoute() {
-    const { userId, photoId } = useParams();
-    return (
-        <UserPhotos
-            userId={userId}
-            photoId={photoId}
-        />
-    );
+  const { userId, photoId } = useParams();
+  return <UserPhotos userId={userId} photoId={photoId} />;
 }
 
 function UserCommentsRoute() {
-    const { userId } = useParams();
-    return (
-        <UserComments
-            userId={userId}
-        />
-    );
+  const { userId } = useParams();
+  return <UserComments userId={userId} />;
 }
 
 function PhotoShare() {
-    const token = useLogin((state) => state.token);
-    const loggedIn = token;
-    return (
-        <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-                <div>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <TopBar />
-                        </Grid>
-                        <div className="main-topbar-buffer" />
-                        <Grid item sm={3}>
-                            <Paper className="main-grid-item">
-                                {loggedIn ? <UserList /> : <></>}
-                            </Paper>
-                        </Grid>
-                        <Grid item sm={9}>
-                            <Paper className="main-grid-item">
-                                <Routes>
-                                    <Route path="/login-register" element={loggedIn ?
-                                        <Navigate replace to={`/users/${token}`} />
-                                        : <LoginRegisterRoute />} />
-                                    <Route path="/users/:userId" element={loggedIn ?
-                                        <UserDetailRoute />
-                                        :
-                                        <Navigate replace to="/login-register" />
-                                    } />
-                                    <Route path={"/photos/:userId"} element={loggedIn ?
-                                        <UserPhotosRoute />
-                                        :
-                                        <Navigate replace to="/login-register" />
-                                    } />
-                                    <Route path={"/photos/:userId/:photoId"} element={loggedIn ?
-                                        <UserPhotosRoute />
-                                        :
-                                        <Navigate replace to="/login-register" />
-                                    } />
-                                    <Route path={"/comments/:userId"} element={loggedIn ?
-                                        <UserCommentsRoute />
-                                        :
-                                        <Navigate replace to="/login-register" />
-                                    } />
-                                    <Route path={"/users"} element={loggedIn ?
-                                        <UserList />
-                                        :
-                                        <Navigate replace to="/login-register" />
-                                    } />
-                                </Routes>
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                </div>
-            </BrowserRouter>
-        </QueryClientProvider>
-    );
+  const token = useLogin((state) => state.token);
+  const loggedIn = token;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <div>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TopBar />
+            </Grid>
+            <div className="main-topbar-buffer" />
+            <Grid item sm={3}>
+              <Paper className="main-grid-item">
+                {loggedIn && <UserList />}
+              </Paper>
+            </Grid>
+            <Grid item sm={9}>
+              <Paper className="main-grid-item">
+                <Routes>
+                  <Route
+                    path="/login-register"
+                    element={
+                      loggedIn ? (
+                        <Navigate replace to={`/users/${token}`} />
+                      ) : (
+                        <LoginRegisterRoute />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/users/:userId"
+                    element={
+                      loggedIn ? (
+                        <UserDetailRoute />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                  <Route
+                    path={"/photos/:userId"}
+                    element={
+                      loggedIn ? (
+                        <UserPhotosRoute />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                  <Route
+                    path={"/photos/:userId/:photoId"}
+                    element={
+                      loggedIn ? (
+                        <UserPhotosRoute />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                  <Route
+                    path={"/comments/:userId"}
+                    element={
+                      loggedIn ? (
+                        <UserCommentsRoute />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                  <Route
+                    path={"/users"}
+                    element={
+                      loggedIn ? (
+                        <UserList />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                </Routes>
+              </Paper>
+            </Grid>
+          </Grid>
+        </div>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
 }
 
 const root = ReactDOM.createRoot(document.getElementById("photoshareapp"));
