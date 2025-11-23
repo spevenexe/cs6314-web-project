@@ -7,7 +7,6 @@ import { loginRequest, registerUser } from "../../api/api";
 import { useLogin } from "../../api/store";
 
 export default function LoginRegister() {
-  //TODO: change to zustand if we still need this in the future
   const [mode, setMode] = useState("login"); // "login" | "register"
 
   const [login_name, setLoginName] = useState("");

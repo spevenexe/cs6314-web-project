@@ -100,8 +100,6 @@ export async function getComments(userId) {
  * @returns
  */
 export async function postComment({photo_id, comment}) {
-  console.log(photo_id);
-  console.log(comment);
   const response = await api.post(
     `/commentsOfPhoto/${photo_id}`,
     { comment: comment },
@@ -206,7 +204,8 @@ export async function loginRequest({ login_name, password}) {
 }
 
 /**
- * //TODO
+ * send a logout request. Fails if the session token does not have an valid user logged in
+ * @returns a success message, or throws the error message.
  */
 export async function logoutRequest() {
   const response = await api.post(
