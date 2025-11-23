@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, Box, TextField } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useComment } from "../../api/store";
 import { postComment } from "../../api/api";
@@ -14,6 +13,8 @@ function CommentButtonContext({ photoId }) {
     unsetAddComment,
   } = useComment();
 
+  const queryClient = useQueryClient();
+
   const {
     status,
     isError,
@@ -24,6 +25,10 @@ function CommentButtonContext({ photoId }) {
     mutationFn: postComment,
     onSuccess: () => {
       unsetAddComment();
+
+      queryClient.invalidateQueries({
+        queryKey: ["userPhotos"]
+      });
     },
   });
 
