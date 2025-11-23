@@ -384,7 +384,7 @@ app.post('/user', async (request, response) => {
  * Attempt to the log the user in via the post request
  */
 app.post('/admin/login', async (request, response, next) => {
-  const { login_name } = request.body;
+  const { login_name, password } = request.body;
 
   if (!login_name) {
     response.status(400).send("No username provided.");
@@ -393,13 +393,14 @@ app.post('/admin/login', async (request, response, next) => {
 
   try {
     const query = User.find({ login_name: login_name })
-      .select("_id")
+      .select("_id password")
       .lean()
       .exec();
 
     const user = await query;
     // if no user is matched, throw error
     if (user.length === 0) throw new Error(`Account ${login_name} does not exist.`);
+    if (user[0].password !== password) throw new Error(`Password for user ${login_name} is incorrect.`);
 
     const uid = user[0]._id.toString();
 

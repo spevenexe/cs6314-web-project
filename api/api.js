@@ -167,10 +167,10 @@ export async function uploadPhoto(domForm) {
  * @param {Object} params
  * @param {string} params.login_name
  */
-export async function loginRequest({ login_name }) {
+export async function loginRequest({ login_name, password}) {
   const response = await api.post(
     `/admin/login`,
-    { login_name: login_name },
+    { login_name: login_name, password: password },
   );
 
   if (response.status === 400) {
