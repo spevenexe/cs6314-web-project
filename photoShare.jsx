@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
 import { Grid, Paper } from "@mui/material";
@@ -9,9 +9,11 @@ import {
   useParams,
   Navigate,
 } from "react-router-dom";
-// import { redirect } from "react-router-dom";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 import "./styles/main.css";
 import TopBar from "./components/TopBar";
@@ -21,6 +23,7 @@ import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
 import { useLogin } from "./api/store";
+import { getCurrentUser } from "./api/api";
 
 const queryClient = new QueryClient();
 
@@ -44,7 +47,22 @@ function UserCommentsRoute() {
 }
 
 function PhotoShare() {
-  const token = useLogin((state) => state.token);
+  const { token, setToken } = useLogin();
+
+  // we have useEffect here, because useMutation has an issue hanging in the backend
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const data = await getCurrentUser();
+        
+        setToken(data._id);
+      } catch (error) {
+        console.error(error.response.data);
+      }
+    }
+    checkSession();
+  },[token]);
+
   const loggedIn = token;
   return (
     <QueryClientProvider client={queryClient}>

@@ -29,7 +29,7 @@ export async function getUser(userId) {
  * @returns the id of the currently logged in user
  */
 export async function getCurrentUser() {
-  const response = await api.get('/user/auth');
+  const response = await api.post('/user/auth');
 
   if (response.status === 400) {
     throw new Error(`${response.data}`);
