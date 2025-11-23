@@ -13,6 +13,7 @@ function SimplePhotos({ photos }) {
           file_name={item.file_name}
           date_time={item.date_time}
           comments={item.comments}
+          photoId = {item._id}
         />
       ))}
     </div>

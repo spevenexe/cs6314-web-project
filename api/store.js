@@ -28,3 +28,12 @@ export const useLogin = create((set) => ({
   token: "", // uid for now
   setToken: (tok) => set(() => ({ token: tok })),
 }));
+
+export const useComment = create((set) => ({
+  addingComment: false,
+  comment: "",
+  photoId: "",
+  setAddComment: (photoId) => set(() => ({ addingComment: true, photoId: photoId })),
+  unsetAddComment: () => set(() => ({ addingComment: false, photoId: "" })),
+  setComment: (comment) => set(() => ({ comment: comment })),
+}));

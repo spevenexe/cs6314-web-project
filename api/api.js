@@ -80,11 +80,14 @@ export async function getComments(userId) {
  * @param {string} photo_id
  * @param {{ comment: string }} comment
  */
-export async function postComment(photo_id, { comment }) {
+export async function postComment({photo_id, comment}) {
+  console.log(photo_id);
+  console.log(comment);
   const response = await api.post(
     `/commentsOfPhoto/${photo_id}`,
     { comment: comment },
   );
+
 
   if (response.status === 400) {
     throw new Error(

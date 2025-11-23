@@ -4,11 +4,12 @@ import "./styles.css";
 
 import PostComment from "./PostComment";
 import PostImage from "./PostImage";
+import CommentButtonContext from "./CommentButtonContext";
 
 /**
  * wrapper for each post
  */
-function Post({ file_name, date_time, comments }) {
+function Post({ file_name, date_time, comments, photoId }) {
   // to handle when comments is null, we convert to empty
   if (!comments) comments = [];
 
@@ -23,6 +24,7 @@ function Post({ file_name, date_time, comments }) {
           user={item.user}
         />
       ))}
+      <CommentButtonContext photoId={photoId}/>
     </div>
   );
 }
