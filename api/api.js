@@ -77,8 +77,10 @@ export async function getComments(userId) {
 
 /**
  * Adds comment to comments of photo photo_id
- * @param {string} photo_id
- * @param {{ comment: string }} comment
+ * @param {Object} params
+ * @param {string} params.photo_id
+ * @param {string} params.comment
+ * @returns
  */
 export async function postComment({photo_id, comment}) {
   console.log(photo_id);
@@ -105,7 +107,65 @@ export async function postComment({photo_id, comment}) {
 }
 
 /**
- * //TODO
+ * Registers new user
+ * @param {Object} userData
+ * @param {string} userData.login_name
+ * @param {string} userData.password
+ * @param {string} userData.first_name
+ * @param {string} userData.last_name
+ * @param {string} [userData.location]
+ * @param {string} [userData.description]
+ * @param {string} [userData.occupation]
+ * @returns
+ */
+export async function registerUser(userData) {
+  const response = await api.post(
+    `/user`,
+    userData
+  );
+
+  if (response.status === 400) {
+    throw new Error(
+      `${response.data}`
+    );
+  }
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred when registering new user: ${response.data}`
+    )
+  }
+
+  return response.data;
+}
+
+/**
+ * uploads photo for logged-in user
+ * @param {FormData}
+ * @returns
+ */
+export async function uploadPhoto(domForm) {
+  const response = await api.post(
+    '/photos/new',
+    domForm
+  );
+
+  if (response.status === 400) {
+    throw new Error(
+      `${response.data}`
+    );
+  }
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred when registering new user: ${response.data}`
+    )
+  }
+
+  return response.data;
+}
+
+/**
+ * @param {Object} params
+ * @param {string} params.login_name
  */
 export async function loginRequest({ login_name }) {
   const response = await api.post(

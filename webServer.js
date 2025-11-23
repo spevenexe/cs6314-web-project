@@ -22,6 +22,10 @@ import User from "./schema/user.js";
 import Photo from "./schema/photo.js";
 import SchemaInfo from "./schema/schemaInfo.js";
 
+import fs from "fs";
+import multer from "multer";
+const processFormBody = multer({ storage: multer.memoryStorage() }).single('uploadedphoto');
+
 const portno = 3001; // Port number to use
 const app = express();
 
@@ -291,6 +295,90 @@ app.post('/commentsOfPhoto/:photo_id', isAuthenticated, async (request, response
 
   return response.status(200).send(newComment);
 });
+
+/**
+ * URL /photos/new - uploads photo
+ */
+app.post('/photos/new', async (request, response) => {
+  processFormBody(request, response, (err1) => {
+    if (err1) {
+      return response.status(500).send(`Error processing photo: ${err1}`);
+    }
+    if (!request.file) {
+      return response.status(400).send(`No file provided`);
+    }
+
+    const timestamp = new Date().valueOf();
+    const filename = 'U' + String(timestamp) + request.file.originalname;
+
+    fs.writeFile('./images/' + filename, request.file.buffer, (err2) => {
+      if (err2) {
+        return response.status(500).send(`Error writing photo: ${err2}`);
+      }
+
+      const newPhoto = new Photo({
+        file_name: filename,
+        date_time: new Date(),
+        user_id: request.session.user,
+        comments: [],
+      });
+
+      newPhoto.save()
+        .then((photo) => {
+          return response.status(200).send(photo);
+        })
+        .catch((err3) => {
+          response.status(500).send(`Error saving photo: ${err3}`);
+        });
+    });
+  });
+});
+
+/**
+ * URL /user - creates a new user
+ */
+app.post('/user', async (request, response) => {
+  const {
+    login_name,
+    password,
+    first_name,
+    last_name,
+    location,
+    description,
+    occupation,
+  } = request.body;
+
+  if (!login_name) {
+    return response.status(400).send(`No login name provided`);
+  }
+  if (!password) {
+    return response.status(400).send(`No password provided`);
+  }
+  if (!first_name) {
+    return response.status(400).send(`No first name provided`);
+  }
+  if (!last_name) {
+    return response.status(400).send(`No last name provided`);
+  }
+
+  const existingName = await User.findOne({ login_name: login_name });
+  if (existingName) {
+    return response.status(400).send(`Login name ${login_name} already exists`);
+  }
+
+  const newUser = new User({
+    login_name,
+    password,
+    first_name,
+    last_name,
+    location: location || '',
+    description: description || '',
+    occupation: occupation || '',
+  });
+
+  const savedUser = await newUser.save();
+  return response.status(200).send(savedUser);
+})
 
 /**
  * Attempt to the log the user in via the post request
