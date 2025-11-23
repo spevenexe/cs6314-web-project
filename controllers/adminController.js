@@ -8,7 +8,7 @@ import User from "../schema/user.js";
  * @returns 
  */
 export async function LogIn(request, response, next) {
-  const { login_name } = request.body;
+  const { login_name, password } = request.body;
 
   if (!login_name) {
     response.status(400).send("No username provided.");
@@ -17,13 +17,14 @@ export async function LogIn(request, response, next) {
 
   try {
     const query = User.find({ login_name: login_name })
-      .select("_id")
+      .select("_id password")
       .lean()
       .exec();
 
     const user = await query;
     // if no user is matched, throw error
     if (user.length === 0) throw new Error(`Account ${login_name} does not exist.`);
+    if (user[0].password !== password) throw new Error(`Password for user ${login_name} is incorrect.`);
 
     const uid = user[0]._id.toString();
 
@@ -40,7 +41,6 @@ export async function LogIn(request, response, next) {
         return response.status(200).send({ _id: uid });
       });
     });
-
 
   } catch (error) {
     response.status(400).send(error.message);
