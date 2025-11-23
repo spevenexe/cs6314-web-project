@@ -17,7 +17,7 @@ export async function getComments(request, response) {
   const { ok, photos } = await query.exec()
     .then(res => ({ ok: true, photos: res }))
     .catch(err => {
-      response.status(404).send(`Failed to load photos from database`);
+      response.status(400).send(`Failed to load photos from database. Is ${id} a valid format? Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer.`);
       console.error(err);
       return { ok: false };
     });
@@ -40,10 +40,6 @@ export async function getComments(request, response) {
     )
     .filter(item => item.user._id.toString() === id);
 
-  if (result.length === 0) {
-    response.status(400).send(`Id ${id} has invalid format or has made no comments. Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer.`);
-    return;
-  }
   response.status(200).send(result);
 }
 
@@ -53,20 +49,25 @@ export async function postComment(request, response) {
     return response.status(400).send("No comment provided.");
   }
   
-  const photo_id = request.params.photo_id;
-  const photo = await Photo.findById(photo_id);
-  if (!photo) {
-    return response.status(404).send(`No photo with id ${photo_id} found`);
-  }
-
-  const newComment = {
+  const photo_id = request.params.photo_id ? request.params.photo_id : "";
+  
+  try {
+    const photo = await Photo.findById(photo_id);
+    if (!photo) {
+      return response.status(404).send(`No photo with id ${photo_id} found`);
+    }
+    
+    const newComment = {
     comment: comment,
     date_time: new Date(),
     user_id: request.session.user,
-  };
+    };
 
-  photo.comments.push(newComment);
-  await photo.save();
+    photo.comments.push(newComment);
+    await photo.save();
 
-  return response.status(200).send(newComment);
+    return response.status(200).send(newComment);
+  } catch (error) {
+    return response.status(400).send(error.message);
+  }
 }

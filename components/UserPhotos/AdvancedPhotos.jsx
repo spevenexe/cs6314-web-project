@@ -33,6 +33,7 @@ function AdvancedPhotos({ photos, userId, targetId }) {
   if (!photo) {
     i = 0;
     photo = photos[0];
+    targetId = photo._id;
     window.history.replaceState(null, document.title, `/photos/${userId}/${photo._id}`);
   }
 
