@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Box, TextField } from "@mui/material";
+import { Button, Box, TextField, Typography } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useComment } from "../../api/store";
@@ -16,7 +16,7 @@ function CommentButtonContext({ photoId }) {
   const queryClient = useQueryClient();
 
   const {
-    status,
+    // status,
     isError,
     isLoading,
     error,
@@ -27,7 +27,7 @@ function CommentButtonContext({ photoId }) {
       unsetAddComment();
 
       queryClient.invalidateQueries({
-        queryKey: ["userPhotos"]
+        queryKey: ["userPhotos"],
       });
     },
   });
@@ -41,12 +41,13 @@ function CommentButtonContext({ photoId }) {
   if (addingComment && photoId === photoIdStore) {
     return (
       <Box component="form" onSubmit={uploadComment} sx={{ mt: 2 }}>
-        <TextField
-          fullWidth
-          label="Comment"
-          // value={"Add Comment here..."}
-          margin="normal"
-        />
+        {isError && (
+          <Typography color="error" variant="body2">
+            {error.message}
+          </Typography>
+        )}
+
+        <TextField fullWidth label="Comment" margin="normal" />
 
         <Button
           variant="contained"
@@ -69,7 +70,11 @@ function CommentButtonContext({ photoId }) {
     );
   } else {
     return (
-      <Button variant="contained" onClick={() => setAddComment(photoId)}>
+      <Button
+        variant="contained"
+        onClick={() => setAddComment(photoId)}
+        sx={{ mt: 2 }}
+      >
         Add Commment +
       </Button>
     );

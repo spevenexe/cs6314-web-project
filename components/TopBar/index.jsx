@@ -128,23 +128,25 @@ function TopBar() {
         </Typography>
         {loginToken ? <PhotoUpload /> : ""}
         <div className="topbar-checkbox-container">
-          <FormGroup>
-            <FormControlLabel
-              control={(
-                <Checkbox
-                  checked={advancedEnabled}
-                  onChange={handleChange}
-                  sx={{
-                    color: grey[400],
-                    "&.Mui-checked": {
-                      color: grey[200],
-                    },
-                  }}
-                />
-              )}
-              label="Advanced Features"
-            />
-          </FormGroup>
+          {loginToken && (
+            <FormGroup>
+              <FormControlLabel
+                control={(
+                  <Checkbox
+                    checked={advancedEnabled}
+                    onChange={handleChange}
+                    sx={{
+                      color: grey[400],
+                      "&.Mui-checked": {
+                        color: grey[200],
+                      },
+                    }}
+                  />
+                )}
+                label="Advanced Features"
+              />
+            </FormGroup>
+          )}
           <Typography variant="h5" color="inherit">
             {context}
           </Typography>

@@ -1,14 +1,11 @@
 import React from "react";
 import { Chip, ListItem, ListItemText, Stack } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import { Link } from "react-router-dom";
 import { green, red } from "@mui/material/colors";
-import {
-  getComments,
-  getPhotos,
-} from "../../api/api";
-import { useQuery } from "@tanstack/react-query";
+import { getComments, getPhotos } from "../../api/api";
 
 /**
  * Advanced element. Features bubbles for photo counts and comment counts
@@ -25,24 +22,27 @@ function AdvancedListElement({ id: userId, first_name, last_name }) {
     queryFn: () => getPhotos(userId).then((photosData) => photosData.length),
   });
 
-
   // fetch comments count
-  const { isPending: isCommentsPending, isError: isCommentsError, data: numComments, error: commentsError } = useQuery({
-    queryKey: ["commentCount", userId],
-    queryFn: () =>
-      getComments(userId).then((commentsData) => commentsData.length),
+  const {
+    isPending: isCommentsPending,
+    isError: isCommentsError,
+    data: numComments,
+    error: commentsError,
+  } = useQuery({
+    queryKey: ["commentCount", userId, "userComments"],
+    queryFn: () => getComments(userId).then((commentsData) => commentsData.length),
   });
 
   // check the state of the promise
   if (isPhotosPending || isCommentsPending) return <>Loading...</>;
-  if (isPhotosError)
-    return (
-      <>An error occurred while fetching photos: {photoError.message}</>
-    );
-  if (isCommentsError)
+  if (isPhotosError) {
+    return <>An error occurred while fetching photos: {photoError.message}</>;
+  }
+  if (isCommentsError) {
     return (
       <>An error occurred while fetching comments: {commentsError.message}</>
     );
+  }
 
   return (
     <Stack direction="row" justifyContent={"space-between"}>
@@ -69,7 +69,9 @@ function AdvancedListElement({ id: userId, first_name, last_name }) {
             },
           }}
           to={`/photos/${userId}`}
-        ></Chip>
+        >
+
+        </Chip>
         {/* the comments button */}
         <Chip
           label={numComments}
@@ -86,7 +88,9 @@ function AdvancedListElement({ id: userId, first_name, last_name }) {
             },
           }}
           to={`/comments/${userId}`}
-        ></Chip>
+        >
+          
+        </Chip>
       </Stack>
     </Stack>
   );

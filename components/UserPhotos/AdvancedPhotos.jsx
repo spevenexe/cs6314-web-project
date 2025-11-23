@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import PostComment from "./PostComment";
 import PostImage from "./PostImage";
+import CommentButtonContext from "./CommentButtonContext";
 
 // A page featuring a single photo, and stepper functionality to travers the user's list of photos.
 function AdvancedPhotos({ photos, userId, targetId }) {
@@ -75,6 +76,8 @@ function AdvancedPhotos({ photos, userId, targetId }) {
           user={item.user}
         />
       ))}
+
+      <CommentButtonContext photoId={targetId}/>
     </div>
   );
 }
