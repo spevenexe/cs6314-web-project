@@ -48,6 +48,19 @@ export function getUser (request, response) {
     });
 }
 
+/**
+ * Returns the id of the logged in user
+ */
+export async function currentUser (request, response) {
+  const uid = request.session.user;
+
+  if (!uid) {
+    return response.status(400).send(`No user logged in`);
+  }
+
+  return response.status(200).send(uid);
+}
+
 
 export async function createUser(request, response) {
   const {
