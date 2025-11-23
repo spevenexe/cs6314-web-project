@@ -8,23 +8,27 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-import { grey } from '@mui/material/colors';
+import { grey } from "@mui/material/colors";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
-import { useAdvancedFeature, usePageStore } from "../../api/store";
+import {
+  useAdvancedFeature,
+  usePageStore,
+  useLogin,
+  useUpload,
+} from "../../api/store";
 import { getUser, logoutRequest } from "../../api/api";
 import { PageType } from "../../api/lib";
-import { useLogin } from "../../api/store";
-
+import PhotoUpload from "./PhotoUpload";
 
 // Shows the status of page: which user we are looking at, what page type, whether advanced mode is activated
 function TopBar() {
   const navigate = useNavigate();
 
-  const {userId:uid,pageType:pType} = usePageStore();
-  const {advancedEnabled, setAdvancedFeatures} = useAdvancedFeature();
+  const { userId: uid, pageType: pType } = usePageStore();
+  const { advancedEnabled, setAdvancedFeatures } = useAdvancedFeature();
 
   // fetch the user name
   const {
@@ -34,9 +38,11 @@ function TopBar() {
     error,
   } = useQuery({
     queryKey: ["topbar", uid],
-    queryFn: () => getUser(uid).then((userData) => {
+    queryFn: () => {
+      return getUser(uid).then((userData) => {
         return `${userData.first_name} ${userData.last_name}`;
-      }),
+      });
+    },
   });
 
   const loginToken = useLogin((state) => state.token);
@@ -44,42 +50,49 @@ function TopBar() {
     mutationFn: logoutRequest,
     onSuccess: () => {
       useLogin.getState().setToken("");
-      navigate('/login-register');
+      navigate("/login-register");
     },
     onError: (err) => {
-      console.error("Error logging out: ", err)
-    }
-  })
+      console.error("Error logging out: ", err);
+    },
+  });
   const {
     isPending: isPending_loggedUser,
     isError: isError_loggedUser,
-    data: firstname_loggedUser, 
+    data: firstname_loggedUser,
     error: error_loggedUser,
   } = useQuery({
     queryKey: ["topbar_loggedUser", loginToken],
-    queryFn: () => getUser(loginToken).then((userData) => {
-      return userData.first_name;
-    })
+    queryFn: () => {
+      return getUser(loginToken).then((userData) => {
+        return userData.first_name;
+      });
+    },
   });
 
   if (isError_loggedUser && loginToken) {
     console.error("Login Token:", loginToken);
     return (
-      <>An error occurred while fetching the logged user: {error_loggedUser.message}</>
+      <>
+        An error occurred while fetching the logged user:{" "}
+        {error_loggedUser.message}
+      </>
     );
   }
 
-  const loggedUserDisplay = loginToken ? `Hi ${firstname_loggedUser}` : "Please login";
-  
+  const loggedUserDisplay = loginToken
+    ? `Hi ${firstname_loggedUser}`
+    : "Please login";
+
   const handleLog = () => {
     if (!loginToken) {
-      navigate('/login-register');
+      navigate("/login-register");
       return;
     }
-    
+
     usePageStore.getState().UpdateID("");
     logoutMutate.mutate();
-  }
+  };
 
   const handleChange = (event) => {
     const checked = event.target.checked;
@@ -95,14 +108,12 @@ function TopBar() {
   if (isPending && uid) return <>Loading...</>;
   if (isError && uid) {
     console.error("UID:", uid);
-    return (
-      <>An error occurred while fetching the user: {error.message}</>
-    );
+    return <>An error occurred while fetching the user: {error.message}</>;
   }
 
   // top right context
   let context;
-  if(!loginToken) context = "";
+  if (!loginToken) context = "";
   else if (pType === PageType.DETAIL) context = userName;
   else if (pType === PageType.PHOTO) context = `Photos of ${userName}`;
   else if (pType === PageType.COMMENT) context = `Comments of ${userName}`;
@@ -111,8 +122,11 @@ function TopBar() {
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar className="toolbar-container">
         <Typography variant="h5" color="inherit">
-          {(isPending_loggedUser && loginToken) ? "Loading..." : loggedUserDisplay}
+          {isPending_loggedUser && loginToken
+            ? "Loading..."
+            : loggedUserDisplay}
         </Typography>
+        {loginToken ? <PhotoUpload /> : ""}
         <div className="topbar-checkbox-container">
           <FormGroup>
             <FormControlLabel

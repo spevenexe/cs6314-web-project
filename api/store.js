@@ -37,3 +37,9 @@ export const useComment = create((set) => ({
   unsetAddComment: () => set(() => ({ addingComment: false, photoId: "" })),
   setComment: (comment) => set(() => ({ comment: comment })),
 }));
+
+export const useUpload = create((set) => ({
+  uploadInput: null,
+  setUpload: (uploadInput) => set(() => ({ uploadInput: uploadInput })),
+  clear: () => set(() => ({uploadInput: null})),
+}));
