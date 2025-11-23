@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Box, Paper, TextField, Button, Typography, Link } from "@mui/material";
+import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-// import { useAuthStore } from "../stores/authStore";
+import { useNavigate } from 'react-router-dom';
+
 import { loginRequest, registerUser } from "../../api/api";
 import { useLogin } from "../../api/store";
-import { useNavigate } from 'react-router-dom';
 
 export default function LoginRegister() {
   //TODO: change to zustand if we still need this in the future
@@ -23,9 +23,7 @@ export default function LoginRegister() {
   // to show 'ready to login' message after successful registration
   const [registerSuccess, setRegisterSuccess] = useState(false); 
 
-
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const setToken = useLogin((state) => state.setToken);
   const loginMutation = useMutation({
     mutationFn: loginRequest,
@@ -61,7 +59,7 @@ export default function LoginRegister() {
   const handleRegister = (e) => {
     e.preventDefault();
     setRegisterSuccess(false);
-    if (password != password_confirm) {
+    if (password !== password_confirm) {
       setPasswordMatch(false);
     } else {
       setPasswordMatch(true);
@@ -141,12 +139,12 @@ export default function LoginRegister() {
             <Box mt={2} textAlign="center">
               <Typography variant="body2">
                 Need an account?{" "}
-                <Link
-                  component="button"
+                <Button
+                  variant="text"
                   onClick={() => {setMode("register"); setRegisterSuccess(false);}}
                 >
                   Register
-                </Link>
+                </Button>
               </Typography>
             </Box>
           </Box>
@@ -229,12 +227,12 @@ export default function LoginRegister() {
             <Box mt={2} textAlign="center">
               <Typography variant="body2">
                 Already have an account?{" "}
-                <Link
-                  component="button"
+                <Button
+                  variant="text"
                   onClick={() => {setMode("login"); setRegisterSuccess(false);}}
                 >
                   Login
-                </Link>
+                </Button>
               </Typography>
             </Box>
           </Box>

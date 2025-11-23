@@ -17,7 +17,6 @@ import {
   useAdvancedFeature,
   usePageStore,
   useLogin,
-  useUpload,
 } from "../../api/store";
 import { getUser, logoutRequest } from "../../api/api";
 import { PageType } from "../../api/lib";

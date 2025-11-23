@@ -132,7 +132,7 @@ export async function registerUser(userData) {
   if (response.status !== 200) {
     throw new Error(
       `An error occurred when registering new user: ${response.data}`
-    )
+    );
   }
 
   return response.data;
@@ -157,7 +157,7 @@ export async function uploadPhoto(domForm) {
   if (response.status !== 200) {
     throw new Error(
       `An error occurred when registering new user: ${response.data}`
-    )
+    );
   }
 
   return response.data;
