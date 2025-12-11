@@ -9,6 +9,8 @@ import mongoose from "mongoose";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bluebird from "bluebird";
 import express, { json } from "express";
+import http from "http";
+import { Server } from "socket.io";
 import session from "express-session";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -67,8 +69,8 @@ app.use(express.static(__dirname));
 app.use("/test", testRouter);
 app.use("/user", userRouter);
 app.use("/", photoRouter);
-app.use("/",commentRouter);
-app.use("/admin",adminRouter);
+app.use("/", commentRouter);
+app.use("/admin", adminRouter);
 
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
@@ -77,11 +79,26 @@ app.get("/", function (request, response) {
 app.use("/test", testRouter);
 app.use("/user", userRouter);
 app.use("/", photoRouter);
-app.use("/",commentRouter);
-app.use("/admin",adminRouter);
+app.use("/", commentRouter);
+app.use("/admin", adminRouter);
 
-const server = app.listen(portno, function () {
-  const port = server.address().port;
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+    origin: "*",   
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on("connection",(socket) => {
+  console.log('a user connected');
+  socket.on('chat message', (msg) => {
+    console.log(`message: ${msg}`);
+  });
+});
+
+httpServer.listen(portno, function () {
+  const port = httpServer.address().port;
   console.log(
     "Listening at http://localhost:" +
     port +

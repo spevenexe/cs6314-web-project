@@ -24,6 +24,7 @@ import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
 import { useLogin } from "./api/store";
 import { getCurrentUser } from "./api/api";
+import socket from "./api/socket";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,16 @@ function UserCommentsRoute() {
 
 function PhotoShare() {
   const { token, setToken } = useLogin();
+
+  useEffect(() => {
+    socket.connect();
+
+    socket.emit('chat message', 'hi');
+
+    return () => {
+      socket.disconnect();
+    };
+  });
 
   // we have useEffect here, because useMutation has an issue hanging in the backend
   useEffect(() => {
