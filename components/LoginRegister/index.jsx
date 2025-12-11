@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginRequest, registerUser } from "../../api/api";
 import { useLogin } from "../../api/store";
 
+import socket from "../../api/socket";
+
 export default function LoginRegister() {
   const [mode, setMode] = useState("login"); // "login" | "register"
 
@@ -28,6 +30,7 @@ export default function LoginRegister() {
     mutationFn: loginRequest,
     onSuccess: ({_id}) => {
       setToken(_id);
+      socket.connect();
       navigate(`/users/${_id}`);
       setRegisterSuccess(false);
     },

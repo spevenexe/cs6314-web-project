@@ -19,6 +19,7 @@ import {
   useLogin,
 } from "../../api/store";
 import { getUser, logoutRequest } from "../../api/api";
+import socket from "../../api/socket";
 import { PageType } from "../../api/lib";
 import PhotoUpload from "./PhotoUpload";
 
@@ -50,6 +51,7 @@ function TopBar() {
     onSuccess: () => {
       useLogin.getState().setToken("");
       navigate("/login-register");
+      socket.disconnect();
     },
     onError: (err) => {
       console.error("Error logging out: ", err);

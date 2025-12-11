@@ -92,8 +92,9 @@ const io = new Server(httpServer, {
 
 io.on("connection",(socket) => {
   console.log('a user connected');
-  socket.on('chat message', (msg) => {
-    console.log(`message: ${msg}`);
+  socket.on('disconnect', (reason) => {
+    console.log(reason);
+    console.log("disconnected!");
   });
 });
 
