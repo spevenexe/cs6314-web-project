@@ -9,6 +9,8 @@ const api = axios.create({
   withCredentials:true,
 });
 
+export default api;
+
 /**
  * Get the data of the specified user.
  * @param {string} userId
