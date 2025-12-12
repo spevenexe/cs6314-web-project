@@ -25,7 +25,6 @@ function PostComment({ date_time, comment, user }) {
   return (
     <div className="comment-container">
       <Typography className="comment-title" variant="subtitle2">
-        {/* Links the the user profile */}
         <Link className="comment-userlink" to={`/users/${user._id}`}>
           <b>
             {user.first_name} {user.last_name}

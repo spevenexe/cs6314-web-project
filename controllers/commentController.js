@@ -77,6 +77,7 @@ export async function getPhotosByMention(request, response) {
 
   const query = Photo.find()
     .select("_id user_id comments file_name date_time")
+    .populate("user_id","_id first_name last_name", User)
     .lean();
 
   const { ok, photos } = await query.exec()

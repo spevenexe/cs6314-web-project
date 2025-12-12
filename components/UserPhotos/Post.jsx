@@ -13,12 +13,14 @@ function Post({ file_name, date_time, comments, photoId }) {
   // to handle when comments is null, we convert to empty
   if (!comments) comments = [];
 
+  console.log(comments);
+
   return (
     <div className="userphotos-post">
       <PostImage file_name={file_name} date_time={date_time} />
       {comments.map((item, index) => (
         <PostComment
-          key={item._id || index}
+          key={`${file_name}-${index}`}
           date_time={item.date_time}
           comment={item.comment}
           user={item.user}

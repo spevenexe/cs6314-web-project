@@ -8,6 +8,7 @@ import { postComment, getUserList } from "../../api/api";
 
 import mentionInputStyle from "./mentionInputStyle";
 import { parseComment } from "../../api/lib";
+import socket from "../../api/socket";
 
 function CommentButtonContext({ photoId }) {
   const [commentBody, setCommentBody] = useState("");
@@ -61,6 +62,8 @@ function CommentButtonContext({ photoId }) {
     
     submitComment({ photo_id: photoId, comment: commentBody, mentions: ids });
     setCommentBody("");
+    
+    socket.emit('mention',{ photo_id: photoId, comment: commentBody, mentions: ids });
   };
 
   if (addingComment && photoId === photoIdStore) {

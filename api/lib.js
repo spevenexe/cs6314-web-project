@@ -32,9 +32,10 @@ export function parseComment(comment) {
   // const regex = `@\\[[^\\]]+\\]\\([^\\)]+\\)`;
   const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
   const matches = comment.matchAll(regex);
+  
   const regex2 = /@\[[^\]]+\]\([^)]+\)/;
   const nonMatches = comment.split(regex2);
-  console.log(nonMatches);
+  
   const arrMatches = [];
   for (const match of matches) {
     arrMatches.push(match);

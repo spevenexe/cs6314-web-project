@@ -92,9 +92,13 @@ const io = new Server(httpServer, {
 
 io.on("connection",(socket) => {
   console.log('a user connected');
+  socket.on('mention', (ids) => {
+    console.log(`emitted ${ids}`);
+    io.emit('mention',ids);
+  });
+
   socket.on('disconnect', (reason) => {
-    console.log(reason);
-    console.log("disconnected!");
+    console.log(`disconnected! Reason: ${reason}`);
   });
 });
 
