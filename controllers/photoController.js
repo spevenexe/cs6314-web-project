@@ -10,7 +10,7 @@ import User from "../schema/user.js";
  * @param {*} request 
  * @param {*} response 
  */
-export async function GetPhoto (request, response) {
+export async function GetPhoto(request, response) {
   const id = request.params.id;
   const query = Photo.find({ user_id: id })
     .select("_id user_id comments file_name date_time")
@@ -74,4 +74,25 @@ export async function uploadPhoto(request, response) {
         });
     });
   });
+}
+
+export async function deletePhoto(request, response) {
+  const photo_id = request.params.id;
+  const user = request.session.user;
+  
+  // validate
+  const photos = Photo.findById(photo_id)
+    .select("user_id")
+    .lean();
+
+
+
+  if (photo_id !== user){
+    return response.status(401).send("Only owners of the photo may delete their own photo");
+  }
+
+
+  const query = Photo.deleteOne({});
+
+  return null;
 }

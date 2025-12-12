@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { isAuthenticated} from "../controllers/middleware.js";
-import { GetPhoto as getPhoto, uploadPhoto } from "../controllers/photoController.js";
+import { deletePhoto, GetPhoto as getPhoto, uploadPhoto } from "../controllers/photoController.js";
 
 const photoRouter = Router();
 
@@ -13,6 +13,8 @@ photoRouter.get('/photosOfUser/:id', isAuthenticated, getPhoto);
 /**
  * Upload a new photo. Expects the request to have a file parameter
  */
-photoRouter.post('/photos/new', uploadPhoto);
+photoRouter.post('/photos/new', isAuthenticated, uploadPhoto);
+
+photoRouter.delete('/photos/:id',isAuthenticated, deletePhoto);
 
 export default photoRouter;
