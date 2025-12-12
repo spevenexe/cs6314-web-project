@@ -99,10 +99,10 @@ export async function getComments(userId) {
  * @param {string} params.comment
  * @returns
  */
-export async function postComment({photo_id, comment}) {
+export async function postComment({photo_id, comment, mentions}) {
   const response = await api.post(
     `/commentsOfPhoto/${photo_id}`,
-    { comment: comment },
+    { comment: comment, mentions: mentions },
   );
 
 
@@ -115,6 +115,29 @@ export async function postComment({photo_id, comment}) {
   if (response.status !== 200) {
     throw new Error(
       `An error occurred while trying to post comment: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
+ * 
+ */
+export async function getPhotosByMention({ user_id }) {
+  const response = await api.get(
+    `/photosByMention/${user_id}`,
+  );
+
+  if (response.status === 400) {
+    throw new Error(
+      `${response.data}`
+    );
+  }
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to get mentions: ${response.data}`
     );
   }
 

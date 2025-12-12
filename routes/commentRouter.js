@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { isAuthenticated } from "../controllers/middleware.js";
-import { getComments, postComment } from "../controllers/commentController.js";
+import { getComments, postComment, getPhotosByMention } from "../controllers/commentController.js";
 
 const commentRouter = Router();
 
@@ -10,5 +10,10 @@ commentRouter.get('/commentsOfUser/:id', isAuthenticated, getComments);
 
 //adds comment to photo's comments
 commentRouter.post('/commentsOfPhoto/:photo_id', isAuthenticated, postComment);
+
+/**
+ * 
+ */
+commentRouter.get('/photosByMention/:id', isAuthenticated, getPhotosByMention);
 
 export default commentRouter;

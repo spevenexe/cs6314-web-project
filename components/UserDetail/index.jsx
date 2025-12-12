@@ -8,7 +8,7 @@ import { PageType } from "../../api/lib";
 import { usePageStore } from "../../api/store";
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
-import { getUser } from "../../api/api";
+import { getUser, getPhotosByMention } from "../../api/api";
 
 function UserDetail({ userId }) {
   // fetch the user details
@@ -22,9 +22,17 @@ function UserDetail({ userId }) {
   useEffect(() => {
     UpdatePageStore(userId, PageType.DETAIL);
   }, [userId]);
+  
+  const { data: data_mentions }  = useQuery({
+    queryKey: ["mention", userId],
+    queryFn: () => getPhotosByMention({user_id: userId}),
+  });
 
   if (isPending) return <>Loading...</>;
   if (isError) return <>An error occurred while fetching the database: {error.message}</>;
+
+  console.log("DATA MENTIONS");
+  console.log(data_mentions);
 
   return (
     <>

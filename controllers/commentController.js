@@ -44,23 +44,23 @@ export async function getComments(request, response) {
 }
 
 export async function postComment(request, response) {
-  const { comment } = request.body;
+  const { comment, mentions } = request.body;
   if (!comment) {
     return response.status(400).send("No comment provided.");
   }
-  
   const photo_id = request.params.photo_id ? request.params.photo_id : "";
-  
+
   try {
     const photo = await Photo.findById(photo_id);
     if (!photo) {
       return response.status(404).send(`No photo with id ${photo_id} found`);
     }
-    
+
     const newComment = {
-    comment: comment,
-    date_time: new Date(),
-    user_id: request.session.user,
+      comment: comment,
+      mentions: mentions || [],
+      date_time: new Date(),
+      user_id: request.session.user,
     };
 
     photo.comments.push(newComment);
@@ -70,4 +70,28 @@ export async function postComment(request, response) {
   } catch (error) {
     return response.status(400).send(error.message);
   }
+}
+
+export async function getPhotosByMention(request, response) {
+  const id = request.params.id;
+
+  const query = Photo.find()
+    .select("_id user_id comments file_name date_time")
+    .lean();
+
+  const { ok, photos } = await query.exec()
+    .then(res => ({ ok: true, photos: res }))
+    .catch(err => {
+      response.status(400).send(`Failed to load photos from database. Is ${id} a valid format? Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer.`);
+      console.error(err);
+      return { ok: false };
+    });
+
+  // an error was caught and sent to the front-end. Stop.
+  if (!ok) return;
+
+  const result = photos
+    .filter(photo => photo.comments.some(comment => comment.mentions?.map(item => item.toString()).includes(id)));
+
+  response.status(200).send(result);
 }
