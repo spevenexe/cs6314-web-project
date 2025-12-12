@@ -3,6 +3,15 @@ import api from "./api";
 export async function deleteComment(commentId){
   if (!commentId) throw new Error('no comment supplied');
 
+  const response = await api.delete(`/comments/${commentId}`);
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to delete the comment: ${response.data}`
+    );
+  }
+
+  return response.data;
 }
 
 /**

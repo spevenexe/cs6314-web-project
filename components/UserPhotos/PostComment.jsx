@@ -1,12 +1,32 @@
 import React from "react";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import "./styles.css";
 import formatDate, { parseComment } from "../../api/lib";
+import { useLogin } from "../../api/store";
+import { deleteComment } from "../../api/comments";
 
 // simple wrapper for each comment
-function PostComment({ date_time, comment, user }) {
+function PostComment({ date_time, comment, user, comment_id }) {
+  // you should be able to delete the comment if you are the uploader
+  const { token } = useLogin();
+  const queryClient = useQueryClient();
+  const { isError, isPending, isSuccess, mutate, error } = useMutation({
+    mutationFn: deleteComment,
+    onSuccess: ({ user_id }) => {
+      // we need to refetch data for this user
+      queryClient.invalidateQueries(user_id);
+    },
+  });
+
+  const handleDelete = (event) => {
+    event.preventDefault();
+
+    mutate(comment_id);
+  };
+
   const formattedDate = formatDate(date_time);
   const [matches, nonMatches] = parseComment(comment);
   const arrMatches = [];
@@ -16,11 +36,14 @@ function PostComment({ date_time, comment, user }) {
   }
 
   const formattedComment = [nonMatches[0]];
-  for (let i = 0; i < arrMatches.length; ++i){
+  for (let i = 0; i < arrMatches.length; ++i) {
     formattedComment.push(arrMatches[i]);
-    formattedComment.push(nonMatches[i+1]);
+    formattedComment.push(nonMatches[i + 1]);
   }
 
+  if (isPending) return <Typography variant="subtitle1">Deleting Comment...</Typography>;
+  if (isError) return <Typography variant="subtitle1">{error.message}</Typography>;
+  if (isSuccess) return <Typography variant="subtitle1">Comment Deleted</Typography>;
 
   return (
     <div className="comment-container">
@@ -32,7 +55,14 @@ function PostComment({ date_time, comment, user }) {
         </Link>{" "}
         {formattedDate}
       </Typography>
-      <Typography variant="body1">{formattedComment}</Typography>
+      <Typography variant="body1">
+        {formattedComment}{" "}
+        {token === user._id && (
+          <Button size="small" color="error" onClick={handleDelete}>
+            Delete
+          </Button>
+        )}
+      </Typography>
     </div>
   );
 }

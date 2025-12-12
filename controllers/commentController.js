@@ -77,7 +77,7 @@ export async function getPhotosByMention(request, response) {
 
   const query = Photo.find()
     .select("_id user_id comments file_name date_time")
-    .populate("user_id","_id first_name last_name", User)
+    .populate("user_id", "_id first_name last_name", User)
     .lean();
 
   const { ok, photos } = await query.exec()
@@ -95,4 +95,44 @@ export async function getPhotosByMention(request, response) {
     .filter(photo => photo.comments.some(comment => comment.mentions?.map(item => item.toString()).includes(id)));
 
   response.status(200).send(result);
+}
+
+export async function deleteComment(request, response) {
+  const comment_id = request.params.id;
+  const uid = request.session.user._id;
+
+  try {
+    const photos = await Photo.find()
+      .select('_id comments')
+      .lean()
+      .exec();
+
+    const commentPhotoMatches = photos
+      .filter(photo => photo.comments.map(comment => comment._id.toString()).includes(comment_id));
+
+    if (commentPhotoMatches.length === 0) {
+      return response.status(404).send('comment not found.');
+    }
+
+    const commentPhoto = commentPhotoMatches[0];
+    // validate the session user is the comment poster
+    const newComments = commentPhoto.comments.filter(c => c._id.toString() !== comment_id || c.user_id.toString() !== uid);
+
+    if (newComments.length === commentPhoto.comments.length) {
+      return response.status(401).send("Only comment uploaders may delete their own comments");
+    }
+
+    // delete the comment
+    const updateResponse = await Photo
+      .updateOne({ _id: commentPhoto._id }, { comments: newComments })
+      .exec();
+
+    if (!updateResponse.acknowledged){
+      throw new Error('Database failed to acknowledge delete request.');
+    }
+  } catch (error) {
+    return response.status(400).send(error.message);
+  }
+
+  return response.status(200).send({user_id: uid});
 }

@@ -75,6 +75,7 @@ function AdvancedPhotos({ photos, userId, targetId }) {
           date_time={item.date_time}
           comment={item.comment}
           user={item.user}
+          comment_id={item._id}
         />
       ))}
 

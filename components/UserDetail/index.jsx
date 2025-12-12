@@ -68,8 +68,6 @@ function UserDetail({ userId }) {
     );
   }
 
-  console.log(data_mentions);
-
   return (
     <>
       <ButtonSwap userId={userId} pageType={"detail"} />

@@ -32,6 +32,7 @@ export async function GetPhoto(request, response) {
   const result = photos.map(photo => ({
     ...photo,
     comments: photo.comments.map(item => ({
+      _id : item._id,
       comment: item.comment,
       date_time: item.date_time,
       user: item.user_id,
