@@ -1,5 +1,6 @@
 import Photo from "../schema/photo.js";
 import User from "../schema/user.js";
+import {IO} from "../socket.js";
 
 /**
  * Get all comments made by a user
@@ -65,6 +66,11 @@ export async function postComment(request, response) {
 
     photo.comments.push(newComment);
     await photo.save();
+
+    const io = IO();
+    mentions.forEach(userId => {
+      io.to(`${userId}-mention`).emit("mention", {newComment, photo});
+    });
 
     return response.status(200).send(newComment);
   } catch (error) {

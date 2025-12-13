@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 
 import { PageType } from "../../api/lib";
 import { useAdvancedFeature, usePageStore } from "../../api/store";
@@ -96,11 +97,11 @@ function UserDetail({ userId }) {
               return (
                 <div key={_id || index} className="userdetail-mentions">
                   <Button
-                    component={Link}
+                    component={HashLink}
                     to={
                       advancedEnabled
                         ? `/photos/${uid}/${_id}`
-                        : `/photos/${uid}/`
+                        : `/photos/${uid}#${_id}`
                     }
                     // prevenet Button style overrides
                     sx={{

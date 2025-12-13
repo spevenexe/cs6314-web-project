@@ -14,7 +14,7 @@ function Post({ file_name, date_time, comments, photoId }) {
   if (!comments) comments = [];
 
   return (
-    <div className="userphotos-post">
+    <div id={photoId} className="userphotos-post">
       <PostImage file_name={file_name} date_time={date_time} photoId={photoId} />
       {comments.map((item, index) => (
         <PostComment

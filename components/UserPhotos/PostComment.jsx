@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,6 +12,8 @@ import { deleteComment } from "../../api/comments";
 function PostComment({ date_time, comment, user, comment_id }) {
   // you should be able to delete the comment if you are the uploader
   const { token } = useLogin();
+  const [buttonState, setButtonState] = useState("delete");
+
   const queryClient = useQueryClient();
   const { isError, isPending, isSuccess, mutate, error } = useMutation({
     mutationFn: deleteComment,
@@ -21,10 +23,18 @@ function PostComment({ date_time, comment, user, comment_id }) {
     },
   });
 
-  const handleDelete = (event) => {
+  const confirmDelete = (event) => {
     event.preventDefault();
+    if (buttonState === "delete") {
+      setButtonState("confirm");
+    } else {
+      mutate(comment_id);
+    }
+  };
 
-    mutate(comment_id);
+  const unconfirmDelete = (event) => {
+    event.preventDefault();
+    setButtonState("delete");
   };
 
   const formattedDate = formatDate(date_time);
@@ -41,9 +51,15 @@ function PostComment({ date_time, comment, user, comment_id }) {
     formattedComment.push(nonMatches[i + 1]);
   }
 
-  if (isPending) return <Typography variant="subtitle1">Deleting Comment...</Typography>;
-  if (isError) return <Typography variant="subtitle1">{error.message}</Typography>;
-  if (isSuccess) return <Typography variant="subtitle1">Comment Deleted</Typography>;
+  if (isPending) {
+    return <Typography variant="subtitle1">Deleting Comment...</Typography>;
+  }
+  if (isError) {
+    return <Typography variant="subtitle1">{error.message}</Typography>;
+  }
+  if (isSuccess) {
+    return <Typography variant="subtitle1">Comment Deleted</Typography>;
+  }
 
   return (
     <div className="comment-container">
@@ -58,9 +74,16 @@ function PostComment({ date_time, comment, user, comment_id }) {
       <Typography variant="body1">
         {formattedComment}{" "}
         {token === user._id && (
-          <Button size="small" color="error" onClick={handleDelete}>
-            Delete
-          </Button>
+          <>
+            <Button size="small" color="error" onClick={confirmDelete}>
+              {buttonState}
+            </Button>
+            {buttonState === "confirm" && (
+              <Button size="small" onClick={unconfirmDelete}>
+                Cancel
+              </Button>
+            )}
+          </>
         )}
       </Typography>
     </div>

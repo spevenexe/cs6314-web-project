@@ -10,7 +10,6 @@ import mongoose from "mongoose";
 import bluebird from "bluebird";
 import express, { json } from "express";
 import http from "http";
-import { Server } from "socket.io";
 import session from "express-session";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -21,6 +20,7 @@ import userRouter from "./routes/userRoute.js";
 import photoRouter from "./routes/photoRoute.js";
 import commentRouter from "./routes/commentRouter.js";
 import adminRouter from "./routes/adminRoute.js";
+import { initSocket } from "./socket.js";
 
 const portno = 3001; // Port number to use
 const app = express();
@@ -83,24 +83,7 @@ app.use("/", commentRouter);
 app.use("/admin", adminRouter);
 
 const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-    origin: "*",   
-    methods: ["GET", "POST"]
-  }
-});
-
-io.on("connection",(socket) => {
-  console.log('a user connected');
-  socket.on('mention', (ids) => {
-    console.log(`emitted ${ids}`);
-    io.emit('mention',ids);
-  });
-
-  socket.on('disconnect', (reason) => {
-    console.log(`disconnected! Reason: ${reason}`);
-  });
-});
+initSocket(httpServer);
 
 httpServer.listen(portno, function () {
   const port = httpServer.address().port;
