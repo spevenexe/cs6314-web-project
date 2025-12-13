@@ -57,10 +57,10 @@ function PostImage({ file_name, date_time, photoId }) {
   });
 
   const favoriteIds = favorites ?? [];
-  const [isFavorite, setIsFavorite] = useState(favoriteIds.includes(photoId));
+  const [isFavorite, setIsFavorite] = useState(favoriteIds.some((item) => item._id === photoId));
 
   useEffect(() => {
-    setIsFavorite(favoriteIds.includes(photoId));
+    setIsFavorite(favoriteIds.some((item) => item._id === photoId));
   }, [favoriteIds, photoId]);
 
   if (isPending) return <>Loading...</>;

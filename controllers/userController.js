@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "../schema/user.js";
+import Photo from "../schema/photo.js";
 
 /**
  * Returns all the User objects.
@@ -165,11 +166,20 @@ export async function getFavorites(request, response) {
   try {
     const user_id = request.session.user;
 
-    const favorites = await User.findById(user_id)
+    const user = await User.findById(user_id)
       .select("favoritedPhotos")
       .lean()
       .exec();
-    return response.status(200).send(favorites.favoritedPhotos ?? []);
+    const favoritePhotoIds = user?.favoritedPhotos ?? [];
+    if(favoritePhotoIds.length === 0) {
+      return response.status(200).send([]);
+    }
+    const photos = await Photo.find({ _id: { $in: favoritePhotoIds } })
+      .select("_id date_time user_id file_name") // only select the fields you need
+      .lean()
+      .exec();
+
+    return response.status(200).send(photos);
   } catch (err) {
     console.error(err);
     return response.status(400).send("An error occurred while fetching the favorite list.");

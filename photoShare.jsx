@@ -22,6 +22,7 @@ import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
+import Favorites from "./components/Favorites";
 import { useLogin } from "./api/store";
 import { getCurrentUser } from "./api/api";
 
@@ -29,6 +30,10 @@ const queryClient = new QueryClient();
 
 function LoginRegisterRoute() {
   return <LoginRegister />;
+}
+
+function FavoritesRoute() {
+  return <Favorites />;
 }
 
 function UserDetailRoute() {
@@ -136,6 +141,16 @@ function PhotoShare() {
                     element={
                       loggedIn ? (
                         <UserList />
+                      ) : (
+                        <Navigate replace to="/login-register" />
+                      )
+                    }
+                  />
+                  <Route
+                    path={"/favorites"}
+                    element={
+                      true ? (
+                        <FavoritesRoute />
                       ) : (
                         <Navigate replace to="/login-register" />
                       )
