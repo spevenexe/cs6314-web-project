@@ -15,7 +15,7 @@ function Post({ file_name, date_time, comments, photoId }) {
 
   return (
     <div className="userphotos-post">
-      <PostImage file_name={file_name} date_time={date_time} />
+      <PostImage file_name={file_name} date_time={date_time} photoId={photoId} />
       {comments.map((item, index) => (
         <PostComment
           key={item._id || index}
@@ -25,7 +25,7 @@ function Post({ file_name, date_time, comments, photoId }) {
           comment_id={item._id}
         />
       ))}
-      <CommentButtonContext photoId={photoId}/>
+      <CommentButtonContext photoId={photoId} />
     </div>
   );
 }

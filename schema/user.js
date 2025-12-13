@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   location: String,
   description: String,
   occupation: String,
+  favoritedPhotos: [mongoose.Schema.Types.ObjectId],
 });
 
 /**

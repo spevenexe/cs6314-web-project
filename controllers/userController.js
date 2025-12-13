@@ -1,9 +1,10 @@
+import mongoose from "mongoose";
 import User from "../schema/user.js";
 
 /**
  * Returns all the User objects.
  */
-export function getUserList (request, response) {
+export function getUserList(request, response) {
   User.find({})
     // select only what is needed
     .select("_id first_name last_name")
@@ -25,7 +26,7 @@ export function getUserList (request, response) {
 /**
  * Returns the information for User (id). Expects the id to be in the request url.
  */
-export function getUser (request, response) {
+export function getUser(request, response) {
   const id = request.params.id;
 
   User.findById(id)
@@ -51,7 +52,7 @@ export function getUser (request, response) {
 /**
  * Returns the id of the logged in user
  */
-export async function currentUser (request, response) {
+export async function currentUser(request, response) {
   const uid = request.session.user;
 
   if (!uid) {
@@ -103,4 +104,74 @@ export async function createUser(request, response) {
 
   const savedUser = await newUser.save();
   return response.status(200).send(savedUser);
+}
+
+export async function addFavorite(request, response) {
+  const photo_id = request.params.photo_id;
+  const user_id = request.session.user;
+
+  if (!user_id) {
+    return response.status(401).send(`Invalid User ID: ${user_id}`);
+  }
+
+  try {
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return response.status(401).send(`User with ID ${user_id} not found`);
+    }
+
+    const photoObjId = new mongoose.Types.ObjectId(photo_id);
+    if (!user.favoritedPhotos.includes(photoObjId)) {
+      user.favoritedPhotos.push(photoObjId);
+      await user.save();
+    }
+
+    return response.status(200).send(`Photo ${photo_id} added to Favorited Photos of User ${user_id}`);
+  } catch (err) {
+    console.error(err);
+    return response.status(500).send(`Failed to add favorite`);
+  }
+}
+
+export async function removeFavorite(request, response) {
+  const photo_id = request.params.photo_id;
+  const user_id = request.session.user;
+
+  try {
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return response.status(401).send(`User with ID ${user_id} not found`);
+    }
+
+    const photoObjId = new mongoose.Types.ObjectId(photo_id);
+    if (!user.favoritedPhotos.includes(photoObjId)) {
+      return response.status(401).send(`Photo ${photo_id} not found in Favorited Photos of User ${user_id}`);
+    }
+    user.favoritedPhotos = user.favoritedPhotos.filter(
+      (id) => id.toString() !== photoObjId.toString()
+    );
+
+    await user.save();
+    return response.status(200).send(`Photo ${photo_id} removed from Favorited Photos of User ${user_id}`);
+  } catch (err) {
+    console.error(err);
+    return response.status(500).send(`Failed to remove favorite`);
+  }
+}
+
+export async function getFavorites(request, response) {
+  try {
+    const user_id = request.session.user;
+
+    const favorites = await User.findById(user_id)
+      .select("favoritedPhotos")
+      .lean()
+      .exec();
+    return response.status(200).send(favorites.favoritedPhotos ?? []);
+  } catch (err) {
+    console.error(err);
+    return response.status(400).send("An error occurred while fetching the favorite list.");
+  }
 }

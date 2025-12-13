@@ -5,8 +5,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:'http://localhost:3001',
-  withCredentials:true,
+  baseURL: 'http://localhost:3001',
+  withCredentials: true,
 });
 
 export default api;
@@ -57,6 +57,62 @@ export async function getUserList() {
 }
 
 /**
+ * Adds photo to logged user's list of favorites
+ * @param {string} photoId
+ * @returns 
+ */
+export async function addFavorite(photoId) {
+  const response = await api.post(
+    `/user/addFavorite/${photoId}`
+  );
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while adding favorite: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
+ * Removes photo to logged user's list of favorites
+ * @param {string} photoId
+ * @returns 
+ */
+export async function removeFavorite(photoId) {
+  const response = await api.post(
+    `/user/removeFavorite/${photoId}`
+  );
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while removing favorite: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
+ * 
+ * @returns The list of favorites of logged user
+ */
+export async function getFavorites() {
+  const response = await api.post(
+    `/user/favorites`
+  );
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while fetching list of favorites: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
+/**
  * Fetch all photos from the database that match the given user ID.
  * @param {string} userId
  * @returns A promise with error configurations that returns the list of photos.
@@ -101,7 +157,7 @@ export async function getComments(userId) {
  * @param {string} params.comment
  * @returns
  */
-export async function postComment({photo_id, comment, mentions}) {
+export async function postComment({ photo_id, comment, mentions }) {
   const response = await api.post(
     `/commentsOfPhoto/${photo_id}`,
     { comment: comment, mentions: mentions },
@@ -207,7 +263,7 @@ export async function uploadPhoto(domForm) {
  * @param {Object} params
  * @param {string} params.login_name
  */
-export async function loginRequest({ login_name, password}) {
+export async function loginRequest({ login_name, password }) {
   const response = await api.post(
     `/admin/login`,
     { login_name: login_name, password: password },
