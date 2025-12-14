@@ -52,6 +52,7 @@ function UserComments({ userId }) {
             comment={item.comment}
             user={item.user}
             photo={item.photo}
+            comment_id={item._id}
           />
         ))}
       </List>

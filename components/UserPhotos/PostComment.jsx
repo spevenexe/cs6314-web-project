@@ -1,65 +1,20 @@
-import React, { useState } from "react";
-import { Button, Typography } from "@mui/material";
+import React from "react";
+import { Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import "./styles.css";
-import formatDate, { parseComment } from "../../lib/util.jsx";
+import formatDate, { createCommentWithMentions, getCommentMatches } from "../../lib/util.jsx";
 import { useLogin } from "../../lib/store";
-import { deleteComment } from "../../api/comments";
+import DeleteCommentButton from "../UserComments/DeleteCommentButton.jsx";
 
 // simple wrapper for each comment
 function PostComment({ date_time, comment, user, comment_id }) {
   // you should be able to delete the comment if you are the uploader
   const { token } = useLogin();
-  const [buttonState, setButtonState] = useState("delete");
-
-  const queryClient = useQueryClient();
-  const { isError, isPending, isSuccess, mutate, error } = useMutation({
-    mutationFn: deleteComment,
-    onSuccess: ({ user_id }) => {
-      // we need to refetch data for this user
-      queryClient.invalidateQueries(user_id);
-    },
-  });
-
-  const confirmDelete = (event) => {
-    event.preventDefault();
-    if (buttonState === "delete") {
-      setButtonState("confirm");
-    } else {
-      mutate(comment_id);
-    }
-  };
-
-  const unconfirmDelete = (event) => {
-    event.preventDefault();
-    setButtonState("delete");
-  };
 
   const formattedDate = formatDate(date_time);
-  const [matches, nonMatches] = parseComment(comment);
-  const arrMatches = [];
-  for (const match of matches) {
-    const formattedMention = `${match[1]}`;
-    arrMatches.push(<Link to={`/users/${match[2]}`}>{formattedMention}</Link>);
-  }
-
-  const formattedComment = [nonMatches[0]];
-  for (let i = 0; i < arrMatches.length; ++i) {
-    formattedComment.push(arrMatches[i]);
-    formattedComment.push(nonMatches[i + 1]);
-  }
-
-  if (isPending) {
-    return <Typography variant="subtitle1">Deleting Comment...</Typography>;
-  }
-  if (isError) {
-    return <Typography variant="subtitle1">{error.message}</Typography>;
-  }
-  if (isSuccess) {
-    return <Typography variant="subtitle1">Comment Deleted</Typography>;
-  }
+  const [matches, nonMatches] = getCommentMatches(comment);
+  const formattedComment = createCommentWithMentions(matches,nonMatches);
 
   return (
     <div className="comment-container">
@@ -73,18 +28,7 @@ function PostComment({ date_time, comment, user, comment_id }) {
       </Typography>
       <Typography variant="body1">
         {formattedComment}{" "}
-        {token === user._id && (
-          <>
-            <Button size="small" color="error" onClick={confirmDelete}>
-              {buttonState}
-            </Button>
-            {buttonState === "confirm" && (
-              <Button size="small" onClick={unconfirmDelete}>
-                Cancel
-              </Button>
-            )}
-          </>
-        )}
+        {token === user._id && <DeleteCommentButton comment_id={comment_id}/>}
       </Typography>
     </div>
   );

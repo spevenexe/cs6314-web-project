@@ -8,7 +8,7 @@ import { getUserList } from "../../api/user.js";
 import { postComment } from "../../api/comments.js";
 
 import mentionInputStyle from "./mentionInputStyle";
-import { parseComment } from "../../lib/util.jsx";
+import { getCommentMatches } from "../../lib/util.jsx";
 
 function CommentButtonContext({ photoId }) {
   const [commentBody, setCommentBody] = useState("");
@@ -57,7 +57,7 @@ function CommentButtonContext({ photoId }) {
   const uploadComment = (e) => {
     e.preventDefault();
 
-    const matches = parseComment(commentBody)[0];
+    const matches = getCommentMatches(commentBody)[0];
     const ids = matches.map(item => item[2]);
     
     submitComment({ photo_id: photoId, comment: commentBody, mentions: ids });
