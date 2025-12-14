@@ -109,6 +109,7 @@ function PostImage({ file_name, date_time, photoId }) {
           <IconButton
             aria-label="favorite"
             onClick={handleFavorite}
+            disabled={isFavorite}
             sx={{
               position: "absolute",
               top: 6,
@@ -119,7 +120,13 @@ function PostImage({ file_name, date_time, photoId }) {
               "&:hover": {
                 backgroundColor: "error.dark",
               },
+              "&.Mui-disabled": {
+                backgroundColor: "error.main",
+                color: "white",
+                opacity: 0.6,
+              },
             }}
+
           >
             {isFavorite ? (
               <FavoriteIcon fontSize="medium" />
