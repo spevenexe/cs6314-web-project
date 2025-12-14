@@ -191,8 +191,6 @@ export async function deleteUser(request, response) {
   const user_id = request.session.user._id;
 
   try {
-    // making queries part of one transaction requires replica set, which is a separable toggle. So we leave the queries like this.
-
     // check existence of user
     const user = await User.findById(user_id)
     .select("_id")
@@ -200,56 +198,7 @@ export async function deleteUser(request, response) {
 
     if (!user) return response.status(404).send("User not found.");
 
-    // remove all mentions of user
-    const photos = await Photo.find({"comments.mentions":user_id}).lean().exec();
-    console.log(photos);
-    
-
-    // await Photo.updateMany(
-    //   { "comments.mentions": user_id },
-    //   [
-    //     {
-    //       $set: {
-    //         comments: {
-    //           $map: {
-    //             input: "$comments",
-    //             as: "c",
-    //             in: {
-    //               $mergeObjects: [
-    //                 "$$c",
-    //                 {
-    //                   mentions: {
-    //                     $filter: {
-    //                       input: "$$c.mentions",
-    //                       as: "m",
-    //                       cond: { $ne: ["$$m", user_id] }
-    //                     }
-    //                   },
-    //                   comment: {
-    //                     // $trim: {
-    //                     //   input: {
-    //                         $replaceAll: {
-    //                           input: "$$c.comment",
-    //                           find: {
-    //                             $regex: `@\\[[^\\]]+\\]\\(${user_id}\\)`
-    //                           },
-    //                           replacement: "@Deleted User"
-    //                         }
-    //                     //   }
-    //                     // }
-    //                   }
-    //                 }
-    //               ]
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   ]
-    // )
-    // .exec();
-
-    // await user.deleteOne();
+    await user.deleteOne();
     console.log(`deleted user ${user_id}`);
   } catch (error) {
     console.error(error.message);

@@ -43,37 +43,70 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
           $set: {
             comments: {
               $map: {
-                input: "$comments",
-                as: "c",
+                input: '$comments',
+                as: 'c',
                 in: {
                   $mergeObjects: [
-                    "$$c",
+                    '$$c',
                     {
-                      mentions: {
-                        $filter: {
-                          input: "$$c.mentions",
-                          as: "m",
-                          cond: { $ne: ["$$m", user_id] }
+                      regexResObject: {
+                        $regexFindAll: {
+                          input: '$$c.comment',
+                          regex: `@\\[[^\\]]+\\]\\(${user_id.toString()}\\)`
                         }
-                      },
-                      comment: {
-                        // $trim: {
-                        //   input: {
-                        $replaceAll: {
-                          input: "$$c.comment",
-                          find: {
-                            $regex: `@\\[[^\\]]+\\]\\(${user_id}\\)`
-                          },
-                          replacement: "@Deleted User"
-                        }
-                        //   }
-                        // }
                       }
                     }
                   ]
                 }
               }
             }
+          }
+        },
+        {
+          $set: {
+            comments: {
+              $map: {
+                input: '$comments',
+                as: 'c',
+                in: {
+                  $mergeObjects: [
+                    '$$c',
+                    {
+                      mentions: {
+                        $filter: {
+                          input: '$$c.mentions',
+                          as: 'm',
+                          cond: {
+                            $ne: [
+                              '$$m',
+                              user_id
+                            ]
+                          }
+                        }
+                      },
+                      comment: {
+                        $reduce: {
+                          input: '$$c.regexResObject',
+                          initialValue: '$$c.comment',
+                          in: {
+                            $replaceAll: {
+                              input: '$$value',
+                              find: '$$this.match',
+                              replacement: '@Deleted User'
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            'comments.regexResObject': 0
           }
         }
       ]
