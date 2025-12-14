@@ -29,7 +29,6 @@ export default function formatDate(date_time) {
 }
 
 export function parseComment(comment) {
-  // const regex = `@\\[[^\\]]+\\]\\([^\\)]+\\)`;
   const regex = /@\[([^\]]+)\]\(([^)]+)\)/g;
   const matches = comment.matchAll(regex);
   

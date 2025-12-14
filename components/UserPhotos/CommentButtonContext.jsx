@@ -3,12 +3,11 @@ import { Button, Box, Typography } from "@mui/material";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 import { Mention, MentionsInput } from "react-mentions";
-import { useComment } from "../../api/store";
+import { useComment } from "../../lib/store";
 import { postComment, getUserList } from "../../api/api";
 
 import mentionInputStyle from "./mentionInputStyle";
-import { parseComment } from "../../api/lib";
-import socket from "../../api/socket";
+import { parseComment } from "../../lib/util.jsx";
 
 function CommentButtonContext({ photoId }) {
   const [commentBody, setCommentBody] = useState("");
@@ -61,9 +60,7 @@ function CommentButtonContext({ photoId }) {
     const ids = matches.map(item => item[2]);
     
     submitComment({ photo_id: photoId, comment: commentBody, mentions: ids });
-    setCommentBody("");
-    
-    socket.emit('mention',{ photo_id: photoId, comment: commentBody, mentions: ids });
+    setCommentBody("");    
   };
 
   if (addingComment && photoId === photoIdStore) {

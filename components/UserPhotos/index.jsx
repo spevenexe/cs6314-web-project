@@ -10,8 +10,8 @@ import SimplePhotos from "./SimplePhotos";
 import AdvancedPhotos from "./AdvancedPhotos";
 import { getPhotos, getUser } from "../../api/api";
 
-import { useAdvancedFeature, usePageStore } from "../../api/store";
-import { PageType } from "../../api/lib";
+import { useAdvancedFeature, usePageStore } from "../../lib/store";
+import { PageType } from "../../lib/util.jsx";
 
 function UserPhotos({ userId, photoId }) {
   const { advancedEnabled, setAdvancedFeatures } = useAdvancedFeature();

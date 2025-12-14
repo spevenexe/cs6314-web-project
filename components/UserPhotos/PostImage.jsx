@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import formatDate from "../../api/lib";
+import formatDate from "../../lib/util.jsx";
 import "./styles.css";
 import { addFavorite, getFavorites, removeFavorite } from "../../api/api";
 

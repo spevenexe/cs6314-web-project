@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import "./styles.css";
-import formatDate, { parseComment } from "../../api/lib";
-import { useLogin } from "../../api/store";
+import formatDate, { parseComment } from "../../lib/util.jsx";
+import { useLogin } from "../../lib/store";
 import { deleteComment } from "../../api/comments";
 
 // simple wrapper for each comment

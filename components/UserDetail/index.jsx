@@ -12,8 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
-import { PageType } from "../../api/lib";
-import { useAdvancedFeature, usePageStore } from "../../api/store";
+import { PageType } from "../../lib/util.jsx";
+import { useAdvancedFeature, usePageStore } from "../../lib/store";
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import { getUser, getPhotosByMention } from "../../api/api";
@@ -43,19 +43,23 @@ function UserDetail({ userId }) {
     error: mentionsError,
   } = useQuery({
     queryKey: ["mention", userId],
-    queryFn: () => getPhotosByMention({ user_id: userId }),
+    queryFn: async () => {
+      const mentions = await getPhotosByMention({ user_id: userId });
+      return mentions;
+    },
   });
 
   // subscribe to socket event for mentions
-  useEffect(() => {
-    socket.on("mention", (mention) => {
-      console.log(mention);
-    });
-
-    return () => {
-      socket.off("mention");
-    };
-  }, []);
+    useEffect(() => {
+      socket.on("newMention", ({newComment, photo}) => {
+        console.log(newComment);
+        console.log(photo);
+      });
+  
+      return () => {
+        socket.off("newMention");
+      };
+    }, []);
 
   if (isPending || isMentionsPending) return <>Loading...</>;
   if (isError) {

@@ -23,7 +23,7 @@ import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
 import Favorites from "./components/Favorites";
-import { useLogin } from "./api/store";
+import { useLogin } from "./lib/store";
 import { getCurrentUser } from "./api/api";
 
 const queryClient = new QueryClient();

@@ -4,7 +4,7 @@ import { Box } from "@mui/system";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import "./styles.css";
-import { useUpload } from "../../api/store";
+import { useUpload } from "../../lib/store";
 import { uploadPhoto } from "../../api/api";
 
 const VisuallyHiddenInput = styled("input")({

@@ -17,10 +17,10 @@ import {
   useAdvancedFeature,
   usePageStore,
   useLogin,
-} from "../../api/store";
+} from "../../lib/store";
 import { getUser, logoutRequest } from "../../api/api";
 import socket from "../../api/socket";
-import { PageType } from "../../api/lib";
+import { PageType } from "../../lib/util.jsx";
 import PhotoUpload from "./PhotoUpload";
 
 // Shows the status of page: which user we are looking at, what page type, whether advanced mode is activated

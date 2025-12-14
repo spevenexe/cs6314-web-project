@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { green, red } from "@mui/material/colors";
 import { getFavorites } from "../../api/api";
 import { HashLink } from "react-router-hash-link";
-import { useAdvancedFeature } from "../../api/store";
+import { useAdvancedFeature } from "../../lib/store";
 
 /**
  * Advanced element. Features bubbles for photo counts and comment counts

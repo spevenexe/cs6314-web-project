@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import "./styles.css";
 import UserCommentLink from "./UserCommentLink";
 import { getComments} from "../../api/api";
-import { useAdvancedFeature, usePageStore } from "../../api/store";
-import { PageType } from "../../api/lib";
+import { useAdvancedFeature, usePageStore } from "../../lib/store";
+import { PageType } from "../../lib/util.jsx";
 
 function UserComments({ userId }) {
   const UpdatePageStore = usePageStore((state) => state.UpdatePageStore);

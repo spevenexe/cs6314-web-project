@@ -3,20 +3,32 @@ import { Link } from "react-router-dom";
 import { Button, ImageList, ImageListItem, Typography } from "@mui/material";
 
 import "./styles.css";
-import formatDate from "../../api/lib";
+import formatDate, {parseComment} from "../../lib/util.jsx";
 
 /**
  * We redefine the inner comment here to prevent the nesting of anchor tags
  */
 function NoLinkComment({ date_time, comment, user }) {
   const formattedDate = formatDate(date_time);
+  const [matches, nonMatches] = parseComment(comment);
+  const arrMatches = [];
+  for (const match of matches) {
+    const formattedMention = `${match[1]}`;
+    arrMatches.push(<Link to={`/users/${match[2]}`}>{formattedMention}</Link>);
+  }
+
+  const formattedComment = [nonMatches[0]];
+  for (let i = 0; i < arrMatches.length; ++i) {
+    formattedComment.push(arrMatches[i]);
+    formattedComment.push(nonMatches[i + 1]);
+  }
 
   return (
     <div className="comment-container">
       <Typography className="comment-title" variant="subtitle2">
-          <b>
-            {user.first_name} {user.last_name}
-          </b>
+        <b>
+          {user.first_name} {user.last_name}
+        </b>
         {formattedDate}
       </Typography>
       <Typography variant="body1">{comment}</Typography>
@@ -44,10 +56,7 @@ function UserCommentLink({ comment, date_time, user, photo }) {
       }}
     >
       <ImageList className="userphotos-imagelist" cols={1}>
-        <ImageListItem
-          src={`/images/${file_name}`}
-          alt={`${file_name}`}
-        >
+        <ImageListItem src={`/images/${file_name}`} alt={`${file_name}`}>
           <img
             className="user-comment-link"
             src={`/images/${file_name}`}
