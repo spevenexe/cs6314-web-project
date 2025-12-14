@@ -50,6 +50,9 @@ function UserDetail({ userId }) {
       const mentions = await getPhotosByMention({ user_id: userId });
       return mentions;
     },
+    enabled: !!userId,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   // subscribe to socket event for mentions
@@ -75,8 +78,6 @@ function UserDetail({ userId }) {
       </>
     );
   }
-
-  console.log(data_mentions);
 
   return (
     <>

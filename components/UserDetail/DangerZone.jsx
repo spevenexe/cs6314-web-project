@@ -21,7 +21,7 @@ function DeleteUserButton() {
         await deleteUser();
         return logoutRequest();
       } catch (err) {
-        console.log(err.message);
+        console.error(err.message);
         throw err;
       }
     },
@@ -43,7 +43,6 @@ function DeleteUserButton() {
     } else {
       setButtonState(DeleteButtonState.DELETED);
       setTimeout(() => {
-        console.log("mutating");
         mutate();
       }, 1000);
     }
@@ -60,7 +59,7 @@ function DeleteUserButton() {
   if (isPending) buttonText = "Deleting Account...";
   if (buttonState === DeleteButtonState.DELETED) buttonText = "Account Deleted";
   if (isError) {
-    console.log(error);
+    console.error(error);
     buttonText = error.message;
   }
 
