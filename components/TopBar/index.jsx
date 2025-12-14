@@ -82,7 +82,7 @@ function TopBar() {
   }
 
   const loggedUserDisplay = loginToken
-    ? `Hi ${loggedUser.first_name}`
+    ? `Hi ${loggedUser?.first_name}`
     : "Please login";
 
   const handleLog = () => {
@@ -149,20 +149,22 @@ function TopBar() {
               />
             </FormGroup>
           )}
-          <Button
-            component={Link}
-            className="fav-btn"
-            to="/favorites"
-            variant="contained"
-            startIcon={<FavoriteIcon />}
-            onClick={() => {UpdatePageType(PageType.FAVORITE);}}
-            sx={{
-              ml: 1,
-              mr: 1,
-            }}
-          >
-            Favorites
-          </Button>
+          {loginToken && (
+            <Button
+              component={Link}
+              className="fav-btn"
+              to="/favorites"
+              variant="contained"
+              startIcon={<FavoriteIcon />}
+              onClick={() => { UpdatePageType(PageType.FAVORITE); }}
+              sx={{
+                ml: 1,
+                mr: 1,
+              }}
+            >
+              Favorites
+            </Button>
+          )}
           <Typography variant="h5" color="inherit">
             {context}
           </Typography>
