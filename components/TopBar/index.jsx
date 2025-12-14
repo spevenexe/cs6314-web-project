@@ -12,7 +12,8 @@ import { grey } from "@mui/material/colors";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
   useAdvancedFeature,
   usePageStore,
@@ -28,7 +29,7 @@ import PhotoUpload from "./PhotoUpload";
 function TopBar() {
   const navigate = useNavigate();
 
-  const { userId: uid, pageType: pType } = usePageStore();
+  const { userId: uid, pageType: pType, UpdatePageType } = usePageStore();
   const { advancedEnabled, setAdvancedFeatures } = useAdvancedFeature();
 
   // fetch the user name
@@ -61,14 +62,12 @@ function TopBar() {
   const {
     isPending: isPending_loggedUser,
     isError: isError_loggedUser,
-    data: firstname_loggedUser,
+    data: loggedUser,
     error: error_loggedUser,
   } = useQuery({
     queryKey: ["topbar_loggedUser", loginToken],
     queryFn: () => {
-      return getUser(loginToken).then((userData) => {
-        return userData.first_name;
-      });
+      return getUser(loginToken);
     },
   });
 
@@ -83,7 +82,7 @@ function TopBar() {
   }
 
   const loggedUserDisplay = loginToken
-    ? `Hi ${firstname_loggedUser}`
+    ? `Hi ${loggedUser.first_name}`
     : "Please login";
 
   const handleLog = () => {
@@ -116,6 +115,7 @@ function TopBar() {
   // top right context
   let context;
   if (!loginToken) context = "";
+  else if (pType === PageType.FAVORITE) context = "";
   else if (pType === PageType.DETAIL) context = userName;
   else if (pType === PageType.PHOTO) context = `Photos of ${userName}`;
   else if (pType === PageType.COMMENT) context = `Comments of ${userName}`;
@@ -149,6 +149,20 @@ function TopBar() {
               />
             </FormGroup>
           )}
+          <Button
+            component={Link}
+            className="fav-btn"
+            to="/favorites"
+            variant="contained"
+            startIcon={<FavoriteIcon />}
+            onClick={() => {UpdatePageType(PageType.FAVORITE);}}
+            sx={{
+              ml: 1,
+              mr: 1,
+            }}
+          >
+            Favorites
+          </Button>
           <Typography variant="h5" color="inherit">
             {context}
           </Typography>

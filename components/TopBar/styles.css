@@ -1,4 +1,4 @@
-.topbar-appBar{
+.topbar-appBar {
   height: 60;
   justify-content: "center";
 }
@@ -9,8 +9,22 @@
   justify-content: space-between;
 }
 
-.topbar-checkbox-container{
+.topbar-checkbox-container {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.MuiButton-root.fav-btn {
+  background-color: rgba(243, 151, 197, 1);
+  color: white;
+  text-transform: none;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgb(0, 0, 0);
+  box-shadow: none;
+}
+
+.fav-btn .MuiSvgIcon-root {
+  color: red;
 }

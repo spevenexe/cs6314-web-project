@@ -1,19 +1,17 @@
-import React from "react";
-import { Button, Chip, Divider, ImageList, ImageListItem, ListItem, ListItemText, Stack, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { HashLink } from "react-router-hash-link";
-import { Link } from "react-router-dom";
-import { green, red } from "@mui/material/colors";
-
+import React, { useState } from "react";
+import { Button, Dialog, Divider, ImageList, ImageListItem, Stack, Typography } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import "./styles.css";
-import { getFavorites } from "../../api/favorite";
-import { useAdvancedFeature } from "../../lib/store";
+import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
+import { getFavorites, removeFavorite } from "../../api/favorite";
 
 /**
  * Advanced element. Features bubbles for photo counts and comment counts
  * */
 function Favorites() {
-  const { advancedEnabled } = useAdvancedFeature();
+  const [openPhoto, setOpenPhoto] = useState(null);
+
+  const queryClient = useQueryClient();
 
   // fetch comments
   const {
@@ -26,6 +24,21 @@ function Favorites() {
     queryFn: getFavorites,
   });
 
+  const {
+    // status,
+    // isError,
+    // isLoading,
+    // error,
+    mutate: unfavorite,
+  } = useMutation({
+    mutationFn: removeFavorite,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["favoritesList"],
+      });
+    },
+  });
+
   // check the state of the promise
   if (isPending) return <>Loading...</>;
   if (isError) {
@@ -33,63 +46,70 @@ function Favorites() {
   }
 
   return (
-    <Stack>
+    <Stack spacing={2}>
+      <Typography variant="h5" fontWeight="bold">
+        Favorite Photos
+      </Typography>
+
+      <Divider />
+
       {favorites.length === 0 ? (
-        <Typography variant="subtitle1">No Mentions.</Typography>
+        <Typography color="text.secondary">
+          You haven’t favorited any photos yet.
+        </Typography>
       ) : (
-        favorites.map(
-          (
-            { _id, file_name, user_id, },
-            index
-          ) => {
-            return (
-              <div key={_id || index} className="userdetail-mentions">
-                <Button
-                  component={HashLink}
-                  to={
-                    advancedEnabled
-                      ? `/photos/${user_id}/${_id}`
-                      : `/photos/${user_id}#${_id}`
-                  }
-                  // prevenet Button style overrides
-                  sx={{
-                    textTransform: "none",
-                    fontSize: "16px",
-                    color: "black",
-                    gap: "1rem",
-                    textAlign: "unset",
-                    display: "flex",
-                    justifyContent: "start",
-                    width: "20vw",
-                  }}
-                >
-                  <ImageList className="userphotos-imagelist" cols={1}>
-                    <ImageListItem
-                      src={`/images/${file_name}`}
-                      alt={`${file_name}`}
-                    >
-                      <img
-                        className="user-comment-link"
-                        src={`/images/${file_name}`}
-                        alt={`${file_name}`}
-                        loading="lazy"
-                      />
-                    </ImageListItem>
-                  </ImageList>
-                </Button>
-                <div>
-                  <Link to={`/users/${user_id}`}>
-                    <Typography variant="subtitle1">
-                      {user_id}
-                    </Typography>
-                  </Link>
-                  <Divider />
-                </div>
-              </div>
-            );
-          }
-        )
+        <ImageList cols={4} gap={12}>
+          {favorites.map((photo) => (
+            <ImageListItem
+              key={photo._id}
+              className="favorite-thumbnail"
+              onClick={() => setOpenPhoto(photo)}
+            >
+              <img
+                src={`/images/${photo.file_name}`}
+                alt={photo.file_name}
+                loading="lazy"
+                className="thumbnail-image"
+              />
+
+              <Button
+                size="small"
+                variant="contained"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  unfavorite(photo._id);
+                }}
+                className="unfavorite-button"
+              >
+                <HeartBrokenIcon fontSize="small" />
+              </Button>
+            </ImageListItem>
+          ))}
+        </ImageList>
       )}
+
+      {/* Modal */}
+      <Dialog
+        open={Boolean(openPhoto)}
+        onClose={() => setOpenPhoto(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        {openPhoto && (
+          <Stack spacing={2} p={2}>
+            <img
+              src={`/images/${openPhoto.file_name}`}
+              alt={openPhoto.file_name}
+              className="modal-image"
+            />
+
+
+            <Typography variant="body2" color="text.secondary" align="center">
+              {new Date(openPhoto.date_time).toLocaleString()}
+            </Typography>
+          </Stack>
+        )}
+      </Dialog>
     </Stack>
   );
 }

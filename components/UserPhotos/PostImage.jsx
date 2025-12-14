@@ -17,9 +17,9 @@ import DeletePhotoButton from "./DeletePhotoButton.jsx";
 
 // the post image and upload time
 function PostImage({ file_name, date_time, photoId }) {
-  const {token} = useLogin();
+  const { token } = useLogin();
   const formattedDate = formatDate(date_time);
-  const {userId} = usePageStore();
+  const { userId } = usePageStore();
 
   const queryClient = useQueryClient();
 
@@ -88,48 +88,63 @@ function PostImage({ file_name, date_time, photoId }) {
 
   return (
     <div className="userphotos-image">
-      <ImageList className="userphotos-imagelist" cols={1}>
+      <ImageList cols={1} sx={{ maxWidth: "75%", margin: "0 auto" }}>
         <ImageListItem
-          src={`/images/${file_name}`}
-          alt={`${file_name}`}
           sx={{
-            maxWidth: "75%",
-            margin: "0 auto",
+            position: "relative",
+            borderRadius: 2,
+            overflow: "hidden",
           }}
         >
           <img
             src={`/images/${file_name}`}
-            alt={`${file_name}`}
+            alt={file_name}
             loading="lazy"
+            style={{
+              width: "100%",
+              display: "block",
+            }}
           />
+
+          <IconButton
+            aria-label="favorite"
+            onClick={handleFavorite}
+            sx={{
+              position: "absolute",
+              top: 6,
+              right: 6,
+              p: 1,
+              backgroundColor: "error.main",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "error.dark",
+              },
+            }}
+          >
+            {isFavorite ? (
+              <FavoriteIcon fontSize="medium" />
+            ) : (
+              <FavoriteBorderIcon fontSize="medium" />
+            )}
+          </IconButton>
+
+          {token === userId && (
+            <IconButton>
+              <DeletePhotoButton photo_id={photoId} />
+            </IconButton>
+          )}
         </ImageListItem>
       </ImageList>
-      <div className="userphotos-options">
-        <IconButton
-          className="favorite-btn"
-          aria-label="favorite"
-          onClick={handleFavorite}
-        >
-          {isFavorite ? (
-            <FavoriteIcon sx={{ color: "red" }} />
-          ) : (
-            <FavoriteBorderIcon sx={{ color: "red" }} />
-          )}
-        </IconButton>
-        {token === userId && <DeletePhotoButton photo_id={photoId}/>}
-      </div>
 
       <Typography
         variant="subtitle1"
-        sx={{
-          maxWidth: "75%",
-          margin: "0 auto",
-        }}
+        sx={{ maxWidth: "75%", margin: "0 auto" }}
       >
         Uploaded on {formattedDate}
       </Typography>
     </div>
   );
+
 }
 
 export default PostImage;

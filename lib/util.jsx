@@ -15,6 +15,9 @@ export class PageType {
   static get PHOTO() {
     return "photo";
   }
+  static get FAVORITE() {
+    return "favorite";
+  }
 }
 
 /**
