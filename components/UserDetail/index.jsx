@@ -16,7 +16,8 @@ import { PageType } from "../../lib/util.jsx";
 import { useAdvancedFeature, usePageStore } from "../../lib/store";
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
-import { getUser, getPhotosByMention } from "../../api/api";
+import { getUser } from "../../api/user.js";
+import { getPhotosByMention } from "../../api/photo.js";
 import socket from "../../api/socket";
 
 function UserDetail({ userId }) {

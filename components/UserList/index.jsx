@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import AdvancedListElement from "./AdvancedListElement";
-import { getUserList } from "../../api/api";
+import { getUserList } from "../../api/user";
 import { useAdvancedFeature } from "../../lib/store";
 
 // the simple list element

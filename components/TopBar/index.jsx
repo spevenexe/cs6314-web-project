@@ -18,7 +18,8 @@ import {
   usePageStore,
   useLogin,
 } from "../../lib/store";
-import { getUser, logoutRequest } from "../../api/api";
+import { getUser } from "../../api/user.js";
+import { logoutRequest } from "../../api/admin.js";
 import socket from "../../api/socket";
 import { PageType } from "../../lib/util.jsx";
 import PhotoUpload from "./PhotoUpload";

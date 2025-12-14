@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import { green, red } from "@mui/material/colors";
-import { getComments, getPhotos } from "../../api/api";
+import { getPhotos } from "../../api/photo";
+import { getComments } from "../../api/comments";
 
 /**
  * Advanced element. Features bubbles for photo counts and comment counts

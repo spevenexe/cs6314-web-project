@@ -4,7 +4,8 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 import { Mention, MentionsInput } from "react-mentions";
 import { useComment } from "../../lib/store";
-import { postComment, getUserList } from "../../api/api";
+import { getUserList } from "../../api/user.js";
+import { postComment } from "../../api/comments.js";
 
 import mentionInputStyle from "./mentionInputStyle";
 import { parseComment } from "../../lib/util.jsx";

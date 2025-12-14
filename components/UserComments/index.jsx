@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import "./styles.css";
 import UserCommentLink from "./UserCommentLink";
-import { getComments} from "../../api/api";
+import { getComments} from "../../api/comments.js";
 import { useAdvancedFeature, usePageStore } from "../../lib/store";
 import { PageType } from "../../lib/util.jsx";
 

@@ -1,12 +1,12 @@
 import React from "react";
 import { Button, Chip, Divider, ImageList, ImageListItem, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-
-import "./styles.css";
+import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import { green, red } from "@mui/material/colors";
-import { getFavorites } from "../../api/api";
-import { HashLink } from "react-router-hash-link";
+
+import "./styles.css";
+import { getFavorites } from "../../api/favorite";
 import { useAdvancedFeature } from "../../lib/store";
 
 /**

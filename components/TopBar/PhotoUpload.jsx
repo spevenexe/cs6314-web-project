@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import "./styles.css";
 import { useUpload } from "../../lib/store";
-import { uploadPhoto } from "../../api/api";
+import { uploadPhoto } from "../../api/photo";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",

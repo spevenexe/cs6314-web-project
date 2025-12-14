@@ -24,7 +24,7 @@ import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
 import Favorites from "./components/Favorites";
 import { useLogin } from "./lib/store";
-import { getCurrentUser } from "./api/api";
+import { getCurrentUser } from "./api/user";
 
 const queryClient = new QueryClient();
 

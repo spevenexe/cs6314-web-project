@@ -3,7 +3,7 @@ import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from 'react-router-dom';
 
-import { loginRequest, registerUser } from "../../api/api";
+import { loginRequest, registerUser } from "../../api/admin";
 import { useLogin } from "../../lib/store";
 
 import socket from "../../api/socket";

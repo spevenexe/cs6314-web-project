@@ -8,7 +8,8 @@ import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import SimplePhotos from "./SimplePhotos";
 import AdvancedPhotos from "./AdvancedPhotos";
-import { getPhotos, getUser } from "../../api/api";
+import { getUser } from "../../api/user.js";
+import { getPhotos } from "../../api/photo.js";
 
 import { useAdvancedFeature, usePageStore } from "../../lib/store";
 import { PageType } from "../../lib/util.jsx";

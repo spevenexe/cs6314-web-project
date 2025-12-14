@@ -6,7 +6,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import formatDate from "../../lib/util.jsx";
 import "./styles.css";
-import { addFavorite, getFavorites, removeFavorite } from "../../api/api";
+import { addFavorite, getFavorites, removeFavorite } from "../../api/favorite.js";
 
 // the post image and upload time
 function PostImage({ file_name, date_time, photoId }) {
