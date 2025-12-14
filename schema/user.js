@@ -20,6 +20,9 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
     const user_id = this._id;
 
     const Photo = mongoose.model('Photo');
+    const User = mongoose.model('User');
+
+    const userPhotos = await Photo.find({ user_id }).exec();
 
     // delete all photos from user
     await Photo.deleteMany({ user_id: user_id }).exec();
@@ -112,6 +115,15 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
       ]
     )
       .exec();
+
+    await User.updateMany(
+      { favoritedPhotos: { $in: userPhotos.map(photo => photo._id) } },
+      {
+        $pull: {
+          favoritedPhotos: { $in: userPhotos.map(photo => photo._id) }
+        }
+      }
+    ).exec();
 
     next();
   } catch (error) {

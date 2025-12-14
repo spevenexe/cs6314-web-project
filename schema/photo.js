@@ -30,6 +30,31 @@ const photoSchema = new mongoose.Schema({
   comments: [commentSchema],
 });
 
+photoSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  async function (next) {
+    try {
+      const photo_id = this._id;
+
+      const User = mongoose.model('User');
+
+      await User.updateMany(
+        { favoritedPhotos: photo_id },
+        {
+          $pull: {
+            favoritedPhotos: photo_id
+          }
+        }
+      ).exec();
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 /**
  * Create a Mongoose Model for a Photo using the photoSchema.
  */
