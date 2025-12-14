@@ -148,7 +148,7 @@ export async function removeFavorite(request, response) {
 
     const photoObjId = new mongoose.Types.ObjectId(photo_id);
     if (!user.favoritedPhotos.includes(photoObjId)) {
-      return response.status(401).send(`Photo ${photo_id} not found in Favorited Photos of User ${user_id}`);
+      return response.status(404).send(`Photo ${photo_id} not found in Favorited Photos of User ${user_id}`);
     }
     user.favoritedPhotos = user.favoritedPhotos.filter(
       (id) => id.toString() !== photoObjId.toString()

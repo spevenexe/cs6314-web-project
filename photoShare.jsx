@@ -52,14 +52,15 @@ function UserCommentsRoute() {
 }
 
 function PhotoShare() {
+  
   const { token, setToken } = useLogin();
-
+  
   // we have useEffect here, because useMutation has an issue hanging in the backend
   useEffect(() => {
     async function checkSession() {
       try {
         const data = await getCurrentUser();
-
+        
         setToken(data._id);
       } catch (error) {
         console.error(error.response.data);
@@ -67,7 +68,7 @@ function PhotoShare() {
     }
     checkSession();
   }, [token]);
-
+  
   const loggedIn = token;
   return (
     <QueryClientProvider client={queryClient}>

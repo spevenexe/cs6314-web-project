@@ -8,6 +8,7 @@ import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import SimplePhotos from "./SimplePhotos";
 import AdvancedPhotos from "./AdvancedPhotos";
+
 import { getUser } from "../../api/user.js";
 import { getPhotos } from "../../api/photo.js";
 

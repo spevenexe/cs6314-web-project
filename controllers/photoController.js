@@ -1,4 +1,5 @@
 import fs from "fs";
+import mongoose from "mongoose";
 
 import { processFormBody } from "./middleware.js";
 import Photo from "../schema/photo.js";
@@ -79,7 +80,7 @@ export async function uploadPhoto(request, response) {
 
 export async function deletePhoto(request, response) {
   const photo_id = request.params.id;
-  const user = request.session.user;
+  const user_id = request.session.user._id;
 
   try {
     // validate
@@ -87,19 +88,17 @@ export async function deletePhoto(request, response) {
       .select("user_id")
       .lean()
       .exec();
-  
-    if (photo.user_id.toString() !== user) {
+
+    if (photo.user_id.toString() !== user_id) {
       return response.status(401).send("Only owners of the photo may delete their own photo");
     }
   
-    const deleteQuery = await photo.deleteOne({_id:photo_id})
+    await Photo.findByIdAndDelete(new mongoose.Types.ObjectId(photo_id))
       .exec();
-    
-    if(!deleteQuery.acknowledged) throw new Error('Database failed to acknowledge delete request.');
   } catch (error) {
     return response.status(400).send(error.message);
   }
 
 
-  return response.status(200).send("Deletion Successful.");
+  return response.status(200).send({user_id: user_id});
 }

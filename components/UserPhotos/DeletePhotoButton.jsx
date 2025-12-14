@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { Button } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { deleteComment } from "../../api/comments";
+import { deletePhoto } from "../../api/photo";
 import DeleteButtonState from "../../lib/deleteButtonState";
 
-export default function DeleteCommentButton({ comment_id }) {
+export default function DeletePhotoButton({ photo_id }) {
   const [buttonState, setButtonState] = useState(DeleteButtonState.DELETE);
 
   const queryClient = useQueryClient();
-  const { isError, isPending, isSuccess, mutate, error } = useMutation({
-    mutationFn: deleteComment,
+  const { isError, isPending, mutate, error } = useMutation({
+    mutationFn: deletePhoto,
     onSuccess: ({ user_id }) => {
       // we need to refetch data for this user
-      queryClient.invalidateQueries(user_id);
+      queryClient.invalidateQueries({ queryKey: ["userPhotos", user_id] });
     },
   });
 
@@ -23,7 +23,7 @@ export default function DeleteCommentButton({ comment_id }) {
       setButtonState(DeleteButtonState.CONFIRM);
     } else {
       setButtonState(DeleteButtonState.DELETED);
-      setTimeout(() => mutate(comment_id), 250);
+      setTimeout(() => mutate(photo_id), 1000);
     }
   };
 
@@ -33,25 +33,35 @@ export default function DeleteCommentButton({ comment_id }) {
   };
 
   if (isPending) {
-    return "Deleting Comment...";
+    return "Deleting Photo...";
   }
   if (isError) {
     return `${error.message}`;
   }
-  if (isSuccess) {
-    return "Comment Deleted";
+
+  if (buttonState === DeleteButtonState.DELETED) {
+    return (
+      <div className="userphoto-delete-button">
+        <Button variant="contained" color="error" disabled>deleted</Button>
+      </div>
+    );
   }
 
   return (
-    <>
-      <Button size="small" color="error" onClick={confirmDelete} disabled={buttonState === DeleteButtonState.DELETED}>
+    <div className="userphoto-delete-button">
+      <Button
+        variant="outlined"
+        size="small"
+        color="error"
+        onClick={confirmDelete}
+      >
         {buttonState}
       </Button>
       {buttonState === DeleteButtonState.CONFIRM && (
-        <Button size="small" onClick={unconfirmDelete}>
+        <Button variant="contained" size="small" onClick={unconfirmDelete}>
           Cancel
         </Button>
       )}
-    </>
+    </div>
   );
 }

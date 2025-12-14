@@ -13,6 +13,7 @@ import CommentButtonContext from "./CommentButtonContext";
 function AdvancedPhotos({ photos, userId, targetId }) {
   const maxSteps = photos.length;
   const navigate = useNavigate();
+  
 
   let photo = null;
   let i = -1;
@@ -59,7 +60,7 @@ function AdvancedPhotos({ photos, userId, targetId }) {
         <Button size="small" onClick={handleBack} disabled={i === 0}>
           {"< Back"}
         </Button>
-        <PostImage file_name={file_name} date_time={date_time} />
+        <PostImage file_name={file_name} date_time={date_time} photoId={targetId} />
         <Button
           size="small"
           onClick={handleNext}

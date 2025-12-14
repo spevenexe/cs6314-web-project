@@ -66,3 +66,17 @@ export async function uploadPhoto(domForm) {
 
   return response.data;
 }
+
+export async function deletePhoto(photo_id) {
+  if (!photo_id) throw new Error("No photo supplied");
+
+  const response = await api.delete(`/photos/${photo_id}`);
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to delete the photo: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
