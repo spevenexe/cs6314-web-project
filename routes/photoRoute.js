@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { isAuthenticated} from "../controllers/middleware.js";
 import { deletePhoto, GetPhoto as getPhoto, uploadPhoto } from "../controllers/photoController.js";
+import { isAuthenticated} from "../controllers/middleware.js";
 
 const photoRouter = Router();
 

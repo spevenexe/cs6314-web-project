@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
+import User from "../schema/user.js";
 
 /**
  * Returns all the User objects.
@@ -188,7 +188,7 @@ export async function getFavorites(request, response) {
 
 
 export async function deleteUser(request, response) {
-  const user_id = request.session.user;
+  const user_id = request.session.user._id;
 
   try {
     // making queries part of one transaction requires replica set, which is a separable toggle. So we leave the queries like this.
@@ -200,70 +200,61 @@ export async function deleteUser(request, response) {
 
     if (!user) return response.status(404).send("User not found.");
 
-    // delete all photos from user
-    await Photo.deleteMany({user_id: user_id}).exec();
-
-    // delete all comments by user
-    await Photo.updateMany(
-      { "comments.user_id": user_id },
-      {
-        $pull: {
-          comments: { user_id: user_id }
-        }
-      }
-    )
-    .exec();
-
     // remove all mentions of user
-    await Photo.updateMany(
-      { "comments.mentions": user_id },
-      [
-        {
-          $set: {
-            comments: {
-              $map: {
-                input: "$comments",
-                as: "c",
-                in: {
-                  $mergeObjects: [
-                    "$$c",
-                    {
-                      mentions: {
-                        $filter: {
-                          input: "$$c.mentions",
-                          as: "m",
-                          cond: { $ne: ["$$m", user_id] }
-                        }
-                      },
-                      comment: {
-                        // $trim: {
-                        //   input: {
-                            $replaceAll: {
-                              input: "$$c.comment",
-                              find: {
-                                $regex: `@\\[[^\\]]+\\]\\(${user_id}\\)`
-                              },
-                              replacement: "@Deleted User"
-                            }
-                        //   }
-                        // }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      ]
-    )
-    .exec();
+    const photos = await Photo.find({"comments.mentions":user_id}).lean().exec();
+    console.log(photos);
+    
 
-    // delete user
-    await User.findByIdAndDelete(user_id).exec();
+    // await Photo.updateMany(
+    //   { "comments.mentions": user_id },
+    //   [
+    //     {
+    //       $set: {
+    //         comments: {
+    //           $map: {
+    //             input: "$comments",
+    //             as: "c",
+    //             in: {
+    //               $mergeObjects: [
+    //                 "$$c",
+    //                 {
+    //                   mentions: {
+    //                     $filter: {
+    //                       input: "$$c.mentions",
+    //                       as: "m",
+    //                       cond: { $ne: ["$$m", user_id] }
+    //                     }
+    //                   },
+    //                   comment: {
+    //                     // $trim: {
+    //                     //   input: {
+    //                         $replaceAll: {
+    //                           input: "$$c.comment",
+    //                           find: {
+    //                             $regex: `@\\[[^\\]]+\\]\\(${user_id}\\)`
+    //                           },
+    //                           replacement: "@Deleted User"
+    //                         }
+    //                     //   }
+    //                     // }
+    //                   }
+    //                 }
+    //               ]
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   ]
+    // )
+    // .exec();
+
+    // await user.deleteOne();
+    console.log(`deleted user ${user_id}`);
   } catch (error) {
-    response.status(400).send(error.message);
+    console.error(error.message);
+    return response.status(400).send(error.message);
   }
 
-  return response.status(200).send("User deleted successfully.");
+  return response.status(200).send(user_id);
 }

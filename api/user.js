@@ -44,3 +44,11 @@ export async function getUserList() {
 
   return response.data;
 }
+
+export async function deleteUser() {
+  const response = await api.delete("/user/delete");
+
+  if (response.status !== 200) throw new Error(`error deleting user: ${response.data}`);
+
+  return response.data;
+}

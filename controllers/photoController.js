@@ -1,5 +1,4 @@
 import fs from "fs";
-import mongoose from "mongoose";
 
 import { processFormBody } from "./middleware.js";
 import Photo from "../schema/photo.js";
@@ -86,15 +85,14 @@ export async function deletePhoto(request, response) {
     // validate
     const photo = await Photo.findById(photo_id)
       .select("user_id")
-      .lean()
       .exec();
 
     if (photo.user_id.toString() !== user_id) {
       return response.status(401).send("Only owners of the photo may delete their own photo");
     }
   
-    await Photo.findByIdAndDelete(new mongoose.Types.ObjectId(photo_id))
-      .exec();
+
+    await photo.deleteOne();
   } catch (error) {
     return response.status(400).send(error.message);
   }

@@ -1,5 +1,5 @@
-import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
+import User from "../schema/user.js";
 import SchemaInfo from "../schema/schemaInfo.js";
 
 /**

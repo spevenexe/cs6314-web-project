@@ -13,16 +13,18 @@ import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
 import { PageType } from "../../lib/util.jsx";
-import { useAdvancedFeature, usePageStore } from "../../lib/store";
+import { useAdvancedFeature, useLogin, usePageStore } from "../../lib/store";
 import "./styles.css";
 import ButtonSwap from "../common/ButtonSwap";
 import { getUser } from "../../api/user.js";
 import { getPhotosByMention } from "../../api/photo.js";
 import socket from "../../api/socket";
+import DangerZone from "./DangerZone.jsx";
 
 function UserDetail({ userId }) {
   //advanced features
   const { advancedEnabled } = useAdvancedFeature();
+  const {token} = useLogin();
 
   // fetch the user details
   const { isPending, isError, data, error } = useQuery({
@@ -51,16 +53,16 @@ function UserDetail({ userId }) {
   });
 
   // subscribe to socket event for mentions
-    useEffect(() => {
-      socket.on("newMention", ({newComment, photo}) => {
-        console.log(newComment);
-        console.log(photo);
-      });
-  
-      return () => {
-        socket.off("newMention");
-      };
-    }, []);
+  useEffect(() => {
+    socket.on("newMention", ({ newComment, photo }) => {
+      console.log(newComment);
+      console.log(photo);
+    });
+
+    return () => {
+      socket.off("newMention");
+    };
+  }, []);
 
   if (isPending || isMentionsPending) return <>Loading...</>;
   if (isError) {
@@ -73,6 +75,8 @@ function UserDetail({ userId }) {
       </>
     );
   }
+
+  console.log(data_mentions);
 
   return (
     <>
@@ -91,62 +95,69 @@ function UserDetail({ userId }) {
         </Typography>
         <Typography variant="h3">Mentions</Typography>
         <Divider />
-        {data_mentions.length === 0 ? (
-          <Typography variant="subtitle1">No Mentions.</Typography>
-        ) : (
-          data_mentions.map(
-            (
-              { _id, file_name, user_id: { _id: uid, first_name, last_name }, },
-              index
-            ) => {
-              return (
-                <div key={_id || index} className="userdetail-mentions">
-                  <Button
-                    component={HashLink}
-                    to={
-                      advancedEnabled
-                        ? `/photos/${uid}/${_id}`
-                        : `/photos/${uid}#${_id}`
-                    }
-                    // prevenet Button style overrides
-                    sx={{
-                      textTransform: "none",
-                      fontSize: "16px",
-                      color: "black",
-                      gap: "1rem",
-                      textAlign: "unset",
-                      display: "flex",
-                      justifyContent: "start",
-                      width: "20vw",
-                    }}
-                  >
-                    <ImageList className="userphotos-imagelist" cols={1}>
-                      <ImageListItem
-                        src={`/images/${file_name}`}
-                        alt={`${file_name}`}
-                      >
-                        <img
-                          className="user-comment-link"
+        <div className="userdetail-mentions-container">
+          {data_mentions.length === 0 ? (
+            <Typography variant="subtitle1">No Mentions.</Typography>
+          ) : (
+            data_mentions.map(
+              (
+                {
+                  _id,
+                  file_name,
+                  user_id: { _id: uid, first_name, last_name },
+                },
+                index
+              ) => {
+                return (
+                  <div key={_id || index} className="userdetail-mentions">
+                    <Button
+                      component={HashLink}
+                      to={
+                        advancedEnabled
+                          ? `/photos/${uid}/${_id}`
+                          : `/photos/${uid}#${_id}`
+                      }
+                      // prevenet Button style overrides
+                      sx={{
+                        textTransform: "none",
+                        fontSize: "16px",
+                        color: "black",
+                        gap: "1rem",
+                        textAlign: "unset",
+                        display: "flex",
+                        justifyContent: "start",
+                        width: "20vw",
+                      }}
+                    >
+                      <ImageList className="userphotos-imagelist" cols={1}>
+                        <ImageListItem
                           src={`/images/${file_name}`}
                           alt={`${file_name}`}
-                          loading="lazy"
-                        />
-                      </ImageListItem>
-                    </ImageList>
-                  </Button>
-                  <div>
-                    <Link to={`/users/${uid}`}>
-                      <Typography variant="subtitle1">
-                        {first_name} {last_name}
-                      </Typography>
-                    </Link>
-                    <Divider />
+                        >
+                          <img
+                            className="user-comment-link"
+                            src={`/images/${file_name}`}
+                            alt={`${file_name}`}
+                            loading="lazy"
+                          />
+                        </ImageListItem>
+                      </ImageList>
+                    </Button>
+                    <div>
+                      <Link to={`/users/${uid}`}>
+                        <Typography variant="subtitle1">
+                          {first_name} {last_name}
+                        </Typography>
+                      </Link>
+                      <Divider />
+                    </div>
                   </div>
-                </div>
-              );
-            }
-          )
-        )}
+                );
+              }
+            )
+          )}
+        </div>
+        {token === userId && <DangerZone/>}
       </div>
     </>
   );
