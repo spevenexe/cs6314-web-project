@@ -171,7 +171,7 @@ export async function getFavorites(request, response) {
       .lean()
       .exec();
     const favoritePhotoIds = user?.favoritedPhotos ?? [];
-    if(favoritePhotoIds.length === 0) {
+    if (favoritePhotoIds.length === 0) {
       return response.status(200).send([]);
     }
     const photos = await Photo.find({ _id: { $in: favoritePhotoIds } })
@@ -184,4 +184,86 @@ export async function getFavorites(request, response) {
     console.error(err);
     return response.status(400).send("An error occurred while fetching the favorite list.");
   }
+}
+
+
+export async function deleteUser(request, response) {
+  const user_id = request.session.user;
+
+  try {
+    // making queries part of one transaction requires replica set, which is a separable toggle. So we leave the queries like this.
+
+    // check existence of user
+    const user = await User.findById(user_id)
+    .select("_id")
+    .exec();
+
+    if (!user) return response.status(404).send("User not found.");
+
+    // delete all photos from user
+    await Photo.deleteMany({user_id: user_id}).exec();
+
+    // delete all comments by user
+    await Photo.updateMany(
+      { "comments.user_id": user_id },
+      {
+        $pull: {
+          comments: { user_id: user_id }
+        }
+      }
+    )
+    .exec();
+
+    // remove all mentions of user
+    await Photo.updateMany(
+      { "comments.mentions": user_id },
+      [
+        {
+          $set: {
+            comments: {
+              $map: {
+                input: "$comments",
+                as: "c",
+                in: {
+                  $mergeObjects: [
+                    "$$c",
+                    {
+                      mentions: {
+                        $filter: {
+                          input: "$$c.mentions",
+                          as: "m",
+                          cond: { $ne: ["$$m", user_id] }
+                        }
+                      },
+                      comment: {
+                        // $trim: {
+                        //   input: {
+                            $replaceAll: {
+                              input: "$$c.comment",
+                              find: {
+                                $regex: `@\\[[^\\]]+\\]\\(${user_id}\\)`
+                              },
+                              replacement: "@Deleted User"
+                            }
+                        //   }
+                        // }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    )
+    .exec();
+
+    // delete user
+    await User.findByIdAndDelete(user_id).exec();
+  } catch (error) {
+    response.status(400).send(error.message);
+  }
+
+  return response.status(200).send("User deleted successfully.");
 }

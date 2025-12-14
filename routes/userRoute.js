@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../controllers/middleware.js";
-import { createUser, getUser, getUserList, currentUser, addFavorite, removeFavorite, getFavorites } from "../controllers/userController.js";
+import { createUser, getUser, getUserList, currentUser, addFavorite, removeFavorite, getFavorites, deleteUser } from "../controllers/userController.js";
 
 const userRouter = Router();
 
@@ -24,5 +24,8 @@ userRouter.post('/favorites', isAuthenticated, getFavorites);
 
 // URL creates a new user
 userRouter.post('/', createUser);
+
+// Delete an existing user
+userRouter.post('/delete', isAuthenticated, deleteUser);
 
 export default userRouter;

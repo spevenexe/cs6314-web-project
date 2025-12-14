@@ -32,7 +32,7 @@ export async function GetPhoto(request, response) {
   const result = photos.map(photo => ({
     ...photo,
     comments: photo.comments.map(item => ({
-      _id : item._id,
+      _id: item._id,
       comment: item.comment,
       date_time: item.date_time,
       user: item.user_id,
@@ -80,20 +80,26 @@ export async function uploadPhoto(request, response) {
 export async function deletePhoto(request, response) {
   const photo_id = request.params.id;
   const user = request.session.user;
+
+  try {
+    // validate
+    const photo = await Photo.findById(photo_id)
+      .select("user_id")
+      .lean()
+      .exec();
   
-  // validate
-  const photos = Photo.findById(photo_id)
-    .select("user_id")
-    .lean();
-
-
-
-  if (photo_id !== user){
-    return response.status(401).send("Only owners of the photo may delete their own photo");
+    if (photo.user_id.toString() !== user) {
+      return response.status(401).send("Only owners of the photo may delete their own photo");
+    }
+  
+    const deleteQuery = await photo.deleteOne({_id:photo_id})
+      .exec();
+    
+    if(!deleteQuery.acknowledged) throw new Error('Database failed to acknowledge delete request.');
+  } catch (error) {
+    return response.status(400).send(error.message);
   }
 
 
-  const query = Photo.deleteOne({});
-
-  return null;
+  return response.status(200).send("Deletion Successful.");
 }

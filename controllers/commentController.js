@@ -69,7 +69,7 @@ export async function postComment(request, response) {
 
     const io = IO();
     mentions.forEach(userId => {
-      io.to(`${userId}-mention`).emit("mention", {newComment, photo});
+      io.to(userId).emit("newMention", {newComment, photo});
     });
 
     return response.status(200).send(newComment);
