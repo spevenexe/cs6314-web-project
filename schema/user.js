@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mongoose from "mongoose";
-import { IO } from "../socket";
+import { IO } from "../socket.js";
 
 /**
  * Define the Mongoose Schema for a User.
@@ -22,7 +22,6 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
 
     const Photo = mongoose.model('Photo');
     const User = mongoose.model('User');
-
     const userPhotos = await Photo.find({ user_id }).exec();
 
     // delete all photos from user
@@ -132,14 +131,13 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
   }
 });
 
-userSchema.post('deleteOne', { document: true, query: false }, async function (next) {
+userSchema.post('deleteOne', { document: true, query: false }, async function () {
   try {
     const io = IO();
     io.emit("user delete");
 
-    next();
   } catch (error) {
-    next(error);
+    console.error(error);
   }
 });
 

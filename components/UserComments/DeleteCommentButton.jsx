@@ -4,9 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { deleteComment } from "../../api/comments";
 import DeleteButtonState from "../../lib/deleteButtonState";
+import { useLogin } from "../../lib/store";
 
 export default function DeleteCommentButton({ comment_id }) {
   const [buttonState, setButtonState] = useState(DeleteButtonState.DELETE);
+  const {token} = useLogin();
 
   const queryClient = useQueryClient();
   const { isError, isPending, isSuccess, mutate, error } = useMutation({
@@ -14,7 +16,7 @@ export default function DeleteCommentButton({ comment_id }) {
     onSuccess: ({ user_id }) => {
       // we need to refetch data for this user
       queryClient.invalidateQueries(user_id);
-      queryClient.invalidateQueries({ queryKey: ["commentCount", user_id] });
+      queryClient.invalidateQueries({ queryKey: ["commentCount", token] });
     },
   });
 

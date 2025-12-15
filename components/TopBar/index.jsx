@@ -115,7 +115,7 @@ function TopBar() {
   // top right context
   let context;
   if (!loginToken) context = "";
-  else if (pType === PageType.FAVORITE) context = "";
+  else if (pType === PageType.FAVORITE) context = "Your Favorites";
   else if (pType === PageType.DETAIL) context = userName;
   else if (pType === PageType.PHOTO) context = `Photos of ${userName}`;
   else if (pType === PageType.COMMENT) context = `Comments of ${userName}`;
@@ -149,7 +149,7 @@ function TopBar() {
               />
             </FormGroup>
           )}
-          {loginToken && (
+          {loginToken && (pType !== PageType.FAVORITE) && (
             <Button
               component={Link}
               className="fav-btn"
