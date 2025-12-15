@@ -1,6 +1,7 @@
+import mongoose from "mongoose";
 import Photo from "../schema/photo.js";
 import User from "../schema/user.js";
-import {IO} from "../socket.js";
+import { IO } from "../socket.js";
 
 /**
  * Get all comments made by a user
@@ -69,7 +70,7 @@ export async function postComment(request, response) {
 
     const io = IO();
     mentions.forEach(userId => {
-      io.to(userId).emit("newMention", {newComment, photo});
+      io.to(userId).emit("newMention", { newComment, photo });
     });
 
     return response.status(200).send(newComment);
@@ -80,6 +81,11 @@ export async function postComment(request, response) {
 
 export async function getPhotosByMention(request, response) {
   const id = request.params.id;
+
+  if (!id) {
+    response.status(400).send('No user ID supplied.');
+    return;
+  }
 
   const query = Photo.find()
     .select("_id user_id comments file_name date_time")
@@ -101,6 +107,79 @@ export async function getPhotosByMention(request, response) {
     .filter(photo => photo.comments.some(comment => comment.mentions?.map(item => item.toString()).includes(id)));
 
   response.status(200).send(result);
+}
+
+export async function getMentions(request, response) {
+  const user_id = request.params.id;
+
+  if (!user_id) return response.status(400).send('No user ID supplied.');
+
+  try {
+    const query = await Photo.aggregate([
+  {
+    $unwind: {
+      path: '$comments'
+    }
+  },
+  // join commenter 
+  { 
+    $lookup: {
+      from: 'users', 
+      localField: 'comments.user_id', 
+      foreignField: '_id', 
+      as: 'comment_user'
+    }
+  }, {
+    $unwind: {
+      path: '$comment_user', 
+      preserveNullAndEmptyArrays: true
+    }
+  }, 
+  // join photo uploader
+  {
+    $lookup: {
+      from: 'users', 
+      localField: 'user_id', 
+      foreignField: '_id', 
+      as: 'photo_user'
+    }
+  }, {
+    $unwind: {
+      path: '$photo_user', 
+      preserveNullAndEmptyArrays: true
+    }
+  }, {
+    $match: {
+      'comments.mentions': new mongoose.Types.ObjectId(user_id)
+    }
+  }, {
+    $project: {
+      _id: '$comments._id', 
+      comment: '$comments.comment', 
+      date_time: '$comments.date_time', 
+      user: {
+        _id: '$comment_user._id', 
+        first_name: '$comment_user.first_name', 
+        last_name: '$comment_user.last_name'
+      }, 
+      photo: {
+        _id: '$_id', 
+        file_name: '$file_name', 
+        uploader: {
+          _id: '$photo_user._id', 
+          first_name: '$photo_user.first_name', 
+          last_name: '$photo_user.last_name'
+        }
+      }
+    }
+  }
+]).exec();
+
+    console.log(query);
+    return response.status(200).send(query);
+  } catch (error) {
+    return response.status(400).send(error.message);
+  }
 }
 
 export async function deleteComment(request, response) {
@@ -133,12 +212,12 @@ export async function deleteComment(request, response) {
       .updateOne({ _id: commentPhoto._id }, { comments: newComments })
       .exec();
 
-    if (!updateResponse.acknowledged){
+    if (!updateResponse.acknowledged) {
       throw new Error('Database failed to acknowledge delete request.');
     }
   } catch (error) {
     return response.status(400).send(error.message);
   }
 
-  return response.status(200).send({user_id: uid});
+  return response.status(200).send({ user_id: uid });
 }

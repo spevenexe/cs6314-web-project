@@ -48,6 +48,20 @@ export async function postComment({ photo_id, comment, mentions }) {
   return response.data;
 }
 
+export async function getMentions({userId}) {
+  if (!userId) throw new Error('no comment supplied');
+
+  const response = await api.get(`/mentions/${userId}`);
+
+  if (response.status !== 200) {
+    throw new Error(
+      `An error occurred while trying to get mentions: ${response.data}`
+    );
+  }
+
+  return response.data;
+}
+
 export async function deleteComment(commentId){
   if (!commentId) throw new Error('no comment supplied');
 

@@ -63,7 +63,7 @@ function PhotoShare() {
         
         setToken(data._id);
       } catch (error) {
-        console.error(error.response.data);
+        console.error(error.message);
       }
     }
     checkSession();
@@ -150,7 +150,7 @@ function PhotoShare() {
                   <Route
                     path={"/favorites"}
                     element={
-                      true ? (
+                      loggedIn ? (
                         <FavoritesRoute />
                       ) : (
                         <Navigate replace to="/login-register" />

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getComments, postComment, getPhotosByMention, deleteComment } from "../controllers/commentController.js";
+import { getComments, postComment, getPhotosByMention, deleteComment, getMentions } from "../controllers/commentController.js";
 import { isAuthenticated } from "../controllers/middleware.js";
 
 const commentRouter = Router();
@@ -15,6 +15,9 @@ commentRouter.post('/commentsOfPhoto/:photo_id', isAuthenticated, postComment);
  * get comments by mention
  */
 commentRouter.get('/photosByMention/:id', isAuthenticated, getPhotosByMention);
+
+// get mentions of a given user
+commentRouter.get('/mentions/:id', isAuthenticated, getMentions);
 
 // delete a comment, if the user is the poster of the comment
 commentRouter.delete('/comments/:id',isAuthenticated,deleteComment);
