@@ -63,19 +63,23 @@ export async function postComment(request, response) {
 
     const newComment = {
       comment: comment,
-      mentions: mentions || [],
+      mentions: mentions ?? [],
       date_time: new Date(),
       user_id: request.session.user,
     };
 
+    console.log("here 1");
+    
     // await photo.updateOne({}, {comments: {$push: {}}});
     photo.comments.push(newComment);
     await photo.save();
-
+    
     const populatedPhoto = await Photo.findById(photo_id)
-      .select("_id user_id file_name comments")
-      .populate("user_id", "_id first_name last_name", User)
-      .populate("comments.user_id", "_id first_name last_name", User);
+    .select("_id user_id file_name comments")
+    .populate("user_id", "_id first_name last_name", User)
+    .populate("comments.user_id", "_id first_name last_name", User);
+    
+    console.log("here 2");
 
     const newMention = {
       comment: comment,
@@ -90,7 +94,7 @@ export async function postComment(request, response) {
     };
 
     const io = IO();
-    mentions.forEach(userId => {
+    newComment.mentions.forEach(userId => {
       io.to(userId).emit("newMention", newMention);
     });
 
