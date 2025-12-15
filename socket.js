@@ -18,6 +18,11 @@ export function initSocket(httpServer) {
       console.log(`user joined room ${userId}`);
     });
 
+    socket.on('leaveUserRoom', (userId) => {
+      socket.leave(userId);
+      console.log(`user left room ${userId}`);
+    });
+
     socket.on('disconnect', (reason) => {
       console.log(`User disconnected. reason: ${reason}`);
     });

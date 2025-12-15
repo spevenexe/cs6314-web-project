@@ -33,7 +33,7 @@ export default function LoginRegister() {
 
       // connect the socket and join the room
       socket.connect();
-      socket.emit('joinUserRoom', _id);
+      // socket.emit('joinUserRoom', _id);
 
       navigate(`/users/${_id}`);
       setRegisterSuccess(false);

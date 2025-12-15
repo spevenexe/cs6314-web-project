@@ -69,7 +69,7 @@ function CommentButtonContext({ photoId }) {
       <Box component="form" onSubmit={uploadComment} sx={{ mt: 2 }}>
         {isError && (
           <Typography color="error" variant="body2">
-            {error.response.data}
+            {error?.message}
           </Typography>
         )}
 

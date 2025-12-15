@@ -8,7 +8,7 @@ import { useLogin } from "../../lib/store";
 import DeleteCommentButton from "../UserComments/DeleteCommentButton.jsx";
 
 // simple wrapper for each comment
-function PostComment({ date_time, comment, user, comment_id }) {
+function PostComment({ date_time, comment, user, comment_id, isOnPhotosPage=true }) {
   // you should be able to delete the comment if you are the uploader
   const { token } = useLogin();
 
@@ -17,7 +17,7 @@ function PostComment({ date_time, comment, user, comment_id }) {
   const formattedComment = createCommentWithMentions(matches,nonMatches);
 
   return (
-    <div className="comment-container">
+    <div className="comment-container" id={comment_id}>
       <Typography className="comment-title" variant="subtitle2">
         <Link className="comment-userlink" to={`/users/${user._id}`}>
           <b>
@@ -28,7 +28,7 @@ function PostComment({ date_time, comment, user, comment_id }) {
       </Typography>
       <Typography variant="body1">
         {formattedComment}{" "}
-        {token === user._id && <DeleteCommentButton comment_id={comment_id}/>}
+        {token === user._id && isOnPhotosPage && <DeleteCommentButton comment_id={comment_id}/>}
       </Typography>
     </div>
   );

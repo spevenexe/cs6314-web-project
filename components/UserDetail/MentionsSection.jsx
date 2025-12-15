@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
+  Box,
   Button,
   Divider,
-  ImageList,
-  ImageListItem,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
 import { useAdvancedFeature, usePageStore } from "../../lib/store";
 import socket from "../../api/socket";
 import { getMentions } from "../../api/comments";
+import PostComment from "../UserPhotos/PostComment";
 
 function Mention({
   comment,
@@ -24,52 +24,66 @@ function Mention({
   const { advancedEnabled } = useAdvancedFeature();
 
   const photo_id = photo._id;
-  const {_id: uploader_id, first_name: uploader_first_name, last_name: uploader_last_name} = photo.uploader;
+  const { _id: uploader_id, first_name: uploader_first_name, last_name: uploader_last_name } = photo.uploader;
   const file_name = photo.file_name;
 
   return (
-    <div className="userdetail-mentions">
+    <div className="userdetail-mentions" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+
       <Button
         component={HashLink}
         to={advancedEnabled ? `/photos/${uploader_id}/${photo_id}` : `/photos/${uploader_id}#${photo_id}`}
-        // prevenet Button style overrides
         sx={{
           textTransform: "none",
-          fontSize: "16px",
-          color: "black",
-          gap: "1rem",
-          textAlign: "unset",
-          display: "flex",
-          justifyContent: "start",
-          width: "20vw",
+          padding: 0,
+          minWidth: 0,
         }}
       >
-        <ImageList className="userphotos-imagelist" cols={1}>
-          <ImageListItem src={`/images/${file_name}`} alt={`${file_name}`}>
-            <img
-              className="user-comment-link"
-              src={`/images/${file_name}`}
-              alt={`${file_name}`}
-              loading="lazy"
-            />
-          </ImageListItem>
-        </ImageList>
+        <img
+          src={`/images/${file_name}`}
+          alt={file_name}
+          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }}
+          loading="lazy"
+        />
       </Button>
       <div>
-        <Link to={`/users/${uploader_id}`}>
-          <Typography variant="subtitle1">
-            {uploader_first_name} {uploader_last_name}
-          </Typography>
-        </Link>
-        <Divider />
+        <div style={{ display: 'flex', gap: '1rem', margin: '0.5rem'}}>
+          <Link to={`/users/${uploader_id}`}>
+            <Typography variant="subtitle1">
+              {uploader_first_name} {uploader_last_name}
+            </Typography>
+          </Link>
+
+          <Button
+            component={HashLink}
+            to={advancedEnabled ? `/photos/${uploader_id}/${photo_id}#${comment_id}` : `/photos/${uploader_id}#${comment_id}`}
+            size="small"
+            variant="outlined"
+          >
+            JUMP TO COMMENT
+          </Button>
+        </div>
+
+        <Divider sx={{ my: 1 }} />
+
+        <PostComment
+          key={comment_id}
+          date_time={comment_post_time}
+          comment={comment}
+          user={user}
+          comment_id={comment_id}
+          isOnPhotosPage={false}
+        />
       </div>
+
     </div>
   );
 }
 
 export default function MentionsSection() {
   const { userId } = usePageStore();
-  const {mentionsState, setMentionsState} = useState([]);
+
+  const queryClient = useQueryClient();
 
   // mentions list
   const {
@@ -80,8 +94,8 @@ export default function MentionsSection() {
   } = useQuery({
     queryKey: ["mention", userId],
     queryFn: async () => {
-      const mentions = await getMentions({userId});
-      return mentions;
+      const _mentions = await getMentions({ userId });
+      return _mentions;
     },
     enabled: !!userId,
     refetchOnWindowFocus: false,
@@ -90,16 +104,25 @@ export default function MentionsSection() {
 
   // subscribe to socket event for mentions
   useEffect(() => {
-    socket.on("newMention", ({ newComment, photo }) => {
-      console.log(newComment);
-      console.log(photo);
-      // setMentionsState(mentions => [...mentions,newComment]);
-    });
+    // if (!socket.connected) {
+    //   return () => { };
+    // }
+    socket.emit("joinUserRoom", userId);
+
+    const handleNewMention = (mention) => {
+      console.log("SOCK IT");
+      console.log(mention);
+      queryClient.invalidateQueries({ queryKey: ["mention", userId] });
+    };
+
+
+    socket.on("newMention", handleNewMention);
 
     return () => {
-      socket.off("newMention");
+      socket.off("newMention", handleNewMention);
+      socket.emit("leaveUserRoom", userId);
     };
-  }, []);
+  }, [userId]);
 
   if (isMentionsPending) return <>Loading...</>;
   if (isMentionsError) {
@@ -110,10 +133,8 @@ export default function MentionsSection() {
     );
   }
 
-  console.log(data_mentions);
-
   return (
-    <>
+    <Box>
       <Typography variant="h3">Mentions</Typography>
       <Divider />
       <div className="userdetail-mentions-container">
@@ -122,18 +143,20 @@ export default function MentionsSection() {
         ) : (
           data_mentions.map(({ _id, comment, date_time, photo, user }, index) => {
             return (
-              <Mention
-                key={_id ?? index}
-                comment={comment}
-                comment_id={_id}
-                comment_post_time={date_time}
-                photo={photo}
-                user={user}
-              />
+              <Box key={_id ?? index} sx={{ mb: 2 }}>
+                <Mention
+                  comment={comment}
+                  comment_id={_id}
+                  comment_post_time={date_time}
+                  photo={photo}
+                  user={user}
+                />
+                {index !== data_mentions.length - 1 && <Divider sx={{ mt: 2 }} />}
+              </Box>
             );
           })
         )}
       </div>
-    </>
+    </Box>
   );
 }
