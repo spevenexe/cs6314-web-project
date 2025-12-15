@@ -68,8 +68,6 @@ export async function postComment(request, response) {
       user_id: request.session.user,
     };
 
-    console.log("here 1");
-    
     // await photo.updateOne({}, {comments: {$push: {}}});
     photo.comments.push(newComment);
     await photo.save();
@@ -78,8 +76,6 @@ export async function postComment(request, response) {
     .select("_id user_id file_name comments")
     .populate("user_id", "_id first_name last_name", User)
     .populate("comments.user_id", "_id first_name last_name", User);
-    
-    console.log("here 2");
 
     const newMention = {
       comment: comment,
