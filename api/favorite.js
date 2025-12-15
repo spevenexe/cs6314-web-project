@@ -25,6 +25,8 @@ export async function addFavorite(photoId) {
  * @returns 
  */
 export async function removeFavorite(photoId) {
+  if (!photoId) throw new Error("No Photo supplied");
+
   const response = await api.post(
     `/user/removeFavorite/${photoId}`
   );

@@ -6,6 +6,8 @@ import api from "./api";
  * @returns 
 */
 export async function getComments(userId) {
+  if (!userId) throw new Error("No user Id supplied.");
+
   const response = await api.get(
     `/commentsOfUser/${userId}`
   );
@@ -27,6 +29,10 @@ export async function getComments(userId) {
  * @returns
  */
 export async function postComment({ photo_id, comment, mentions }) {
+  if (!photo_id) throw new Error("No Photo supplied.");
+  if (!comment) throw new Error("No Comment supplied.");
+  if (mentions == null) console.warn("Mentions is null.");
+
   const response = await api.post(
     `/commentsOfPhoto/${photo_id}`,
     { comment: comment, mentions: mentions },

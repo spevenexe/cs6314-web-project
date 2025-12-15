@@ -6,6 +6,8 @@ import api from "./api";
  * @returns A promise with error configurations that returns the list of photos.
  */
 export async function getPhotos(userId) {
+  if (!userId) throw new Error("No User ID supplied");
+
   const response = await api.get(
     `/photosOfUser/${userId}`
   );
@@ -23,6 +25,8 @@ export async function getPhotos(userId) {
  * 
  */
 export async function getPhotosByMention({ user_id }) {
+  if (!user_id) throw new Error("No User ID supplied");
+
   const response = await api.get(
     `/photosByMention/${user_id}`,
   );
@@ -48,6 +52,8 @@ export async function getPhotosByMention({ user_id }) {
  * @returns
  */
 export async function uploadPhoto(domForm) {
+  if (!domForm) throw new Error("No Photo supplied");
+
   const response = await api.post(
     '/photos/new',
     domForm

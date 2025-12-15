@@ -13,6 +13,24 @@ import api from "./api";
  * @returns
  */
 export async function registerUser(userData) {
+  const {
+    login_name,
+    password,
+    first_name,
+    last_name,
+    location,
+    description,
+    occupation,
+  } = userData;
+
+  if (!login_name) throw new Error("Missing field: User Name ");
+  if (!password) throw new Error("Missing field: Password ");
+  if (!first_name) throw new Error("Missing field: First Name ");
+  if (!last_name) throw new Error("Missing field: Last Name");
+  if (!location) throw new Error("Missing field: Location ");
+  if (!description) throw new Error("Missing field: Description ");
+  if (!occupation) throw new Error("Missing field: Occupation");
+
   const response = await api.post(
     `/user`,
     userData
@@ -37,6 +55,9 @@ export async function registerUser(userData) {
  * @param {string} params.login_name
  */
 export async function loginRequest({ login_name, password }) {
+  if (!login_name) throw new Error("No Login name supplied.");
+  if (!password) throw new Error("No password supplied.");
+
   const response = await api.post(
     `/admin/login`,
     { login_name: login_name, password: password },
