@@ -13,7 +13,7 @@ function DeleteUserButton() {
   const [buttonState, setButtonState] = useState(DeleteButtonState.DELETE);
 
   const navigate = useNavigate();
-  const { setToken, token } = useLogin();
+  const { setToken} = useLogin();
   const queryClient = useQueryClient();
   const { isError, isPending, mutate, error } = useMutation({
     mutationFn: async () => {
@@ -28,7 +28,6 @@ function DeleteUserButton() {
     onSuccess: () => {
       // we need to refetch data for this user
       queryClient.invalidateQueries({ queryKey: ["userList"] });
-      queryClient.invalidateQueries({queryKey: [token]});
 
       // logout on the frontend
       setToken("");

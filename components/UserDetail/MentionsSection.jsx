@@ -104,22 +104,23 @@ export default function MentionsSection() {
 
   // subscribe to socket event for mentions
   useEffect(() => {
-    // if (!socket.connected) {
-    //   return () => { };
-    // }
     socket.emit("joinUserRoom", userId);
 
-    const handleNewMention = (mention) => {
-      console.log("SOCK IT");
-      console.log(mention);
-      queryClient.invalidateQueries({ queryKey: ["mention", userId] });
+    // for user deletions
+    const handleUserDeleteEvent = () => {
+      queryClient.invalidateQueries({queryKey:["mention", userId]});
     };
 
-
+    const handleNewMention = () => {
+      queryClient.invalidateQueries({ queryKey: ["mention", userId] });
+    };
+    
+    socket.on("user delete",handleUserDeleteEvent);
     socket.on("newMention", handleNewMention);
 
     return () => {
       socket.off("newMention", handleNewMention);
+      socket.off("user delete",handleUserDeleteEvent);
       socket.emit("leaveUserRoom", userId);
     };
   }, [userId]);

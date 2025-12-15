@@ -92,10 +92,6 @@ export async function postComment(request, response) {
     const io = IO();
     mentions.forEach(userId => {
       io.to(userId).emit("newMention", newMention);
-
-      console.log("SOCKED IT (post)");
-      console.log(userId);
-      console.log(newMention);
     });
 
     return response.status(200).send(newComment);
@@ -240,9 +236,6 @@ export async function deleteComment(request, response) {
     const io = IO();
     oldComment.mentions.forEach(userId => {
       io.to(userId.toString()).emit("newMention", {});
-
-      console.log("SOCKED IT (delete)");
-      console.log(userId.toString());
     });
 
     if (!updateResponse.acknowledged) {

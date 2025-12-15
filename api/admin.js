@@ -18,18 +18,12 @@ export async function registerUser(userData) {
     password,
     first_name,
     last_name,
-    location,
-    description,
-    occupation,
   } = userData;
 
   if (!login_name) throw new Error("Missing field: User Name ");
   if (!password) throw new Error("Missing field: Password ");
   if (!first_name) throw new Error("Missing field: First Name ");
   if (!last_name) throw new Error("Missing field: Last Name");
-  if (!location) throw new Error("Missing field: Location ");
-  if (!description) throw new Error("Missing field: Description ");
-  if (!occupation) throw new Error("Missing field: Occupation");
 
   const response = await api.post(
     `/user`,

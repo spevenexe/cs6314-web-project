@@ -30,7 +30,7 @@ function AdvancedListElement({ id: userId, first_name, last_name }) {
     data: numComments,
     error: commentsError,
   } = useQuery({
-    queryKey: ["commentCount", userId, "userComments"],
+    queryKey: ["commentCount", userId],
     queryFn: () => getComments(userId).then((commentsData) => commentsData.length),
   });
 

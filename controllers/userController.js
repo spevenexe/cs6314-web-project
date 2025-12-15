@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Photo from "../schema/photo.js";
 import User from "../schema/user.js";
+import { IO } from "../socket.js";
 
 /**
  * Returns all the User objects.
@@ -193,12 +194,16 @@ export async function deleteUser(request, response) {
   try {
     // check existence of user
     const user = await User.findById(user_id)
-    .select("_id")
-    .exec();
+      .select("_id")
+      .exec();
 
     if (!user) return response.status(404).send("User not found.");
 
     await user.deleteOne();
+
+    const io = IO();
+    io.emit("user delete");
+
     console.log(`deleted user ${user_id}`);
   } catch (error) {
     console.error(error.message);

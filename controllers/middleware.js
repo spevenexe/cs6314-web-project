@@ -17,7 +17,7 @@ export async function isAuthenticated(request, response, next) {
     .lean()
     .exec();
 
-  if (query.length === 0) {
+  if (!query || query.length === 0) {
     response.status(401).send("Only logged users are authorized to access this.");
   } else {
     next();

@@ -30,6 +30,8 @@ function PhotoUpload() {
     onSuccess: ({ user_id }) => {
       // we need to refetch the photos of this user
       queryClient.invalidateQueries(user_id);
+      queryClient.invalidateQueries(["photoCount", user_id]);
+      queryClient.invalidateQueries(["userPhotos", user_id]);
       setUpload(null);
     },
   });

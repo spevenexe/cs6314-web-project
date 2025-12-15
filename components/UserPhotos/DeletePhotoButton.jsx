@@ -14,6 +14,7 @@ export default function DeletePhotoButton({ photo_id }) {
     onSuccess: ({ user_id }) => {
       // we need to refetch data for this user
       queryClient.invalidateQueries({ queryKey: ["userPhotos", user_id] });
+      queryClient.invalidateQueries({ queryKey: ["photoCount", user_id] });
     },
   });
 
@@ -23,7 +24,10 @@ export default function DeletePhotoButton({ photo_id }) {
       setButtonState(DeleteButtonState.CONFIRM);
     } else {
       setButtonState(DeleteButtonState.DELETED);
-      setTimeout(() => mutate(photo_id), 1000);
+      setTimeout(() => {
+        mutate(photo_id);
+        setButtonState(DeleteButtonState.DELETE);
+      }, 1000);
     }
   };
 
@@ -41,14 +45,14 @@ export default function DeletePhotoButton({ photo_id }) {
 
   if (buttonState === DeleteButtonState.DELETED) {
     return (
-      <div className="userphoto-delete-button">
+      <div className="userphoto-delete-button" style={{alignSelf:"center", marginTop: "0.5rem"}}>
         <Button variant="contained" color="error" disabled>deleted</Button>
       </div>
     );
   }
 
   return (
-    <div className="userphoto-delete-button">
+    <div className="userphoto-delete-button" style={{alignSelf:"center", marginTop: "0.5rem"}}>
       <Button
         variant="outlined"
         size="small"

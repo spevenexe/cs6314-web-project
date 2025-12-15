@@ -110,7 +110,7 @@ export default function LoginRegister() {
 
         {registerMutation.error && mode === "register" && (
           <Typography color="error" variant="body2">
-            {registerMutation.error.response.data}
+            {registerMutation.error.message}
           </Typography>
         )}
 

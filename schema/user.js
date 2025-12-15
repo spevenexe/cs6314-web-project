@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mongoose from "mongoose";
+import { IO } from "../socket";
 
 /**
  * Define the Mongoose Schema for a User.
@@ -124,6 +125,17 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
         }
       }
     ).exec();
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+userSchema.post('deleteOne', { document: true, query: false }, async function (next) {
+  try {
+    const io = IO();
+    io.emit("user delete");
 
     next();
   } catch (error) {

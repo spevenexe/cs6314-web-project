@@ -14,6 +14,7 @@ export default function DeleteCommentButton({ comment_id }) {
     onSuccess: ({ user_id }) => {
       // we need to refetch data for this user
       queryClient.invalidateQueries(user_id);
+      queryClient.invalidateQueries({ queryKey: ["commentCount", user_id] });
     },
   });
 

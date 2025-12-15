@@ -126,7 +126,6 @@ function PostImage({ file_name, date_time, photoId }) {
                 opacity: 0.6,
               },
             }}
-
           >
             {isFavorite ? (
               <FavoriteIcon fontSize="medium" />
@@ -134,14 +133,10 @@ function PostImage({ file_name, date_time, photoId }) {
               <FavoriteBorderIcon fontSize="medium" />
             )}
           </IconButton>
-
-          {token === userId && (
-            <IconButton>
-              <DeletePhotoButton photo_id={photoId} />
-            </IconButton>
-          )}
         </ImageListItem>
       </ImageList>
+      
+      {token === userId && <DeletePhotoButton photo_id={photoId} />}
 
       <Typography
         variant="subtitle1"
@@ -151,7 +146,6 @@ function PostImage({ file_name, date_time, photoId }) {
       </Typography>
     </div>
   );
-
 }
 
 export default PostImage;

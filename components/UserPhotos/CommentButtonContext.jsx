@@ -3,7 +3,7 @@ import { Button, Box, Typography } from "@mui/material";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 import { Mention, MentionsInput } from "react-mentions";
-import { useComment } from "../../lib/store";
+import { useComment, usePageStore } from "../../lib/store";
 import { getUserList } from "../../api/user.js";
 import { postComment } from "../../api/comments.js";
 
@@ -12,6 +12,7 @@ import { getCommentMatches } from "../../lib/util.jsx";
 
 function CommentButtonContext({ photoId }) {
   const [commentBody, setCommentBody] = useState("");
+  const {userId} = usePageStore();
 
   const {
     addingComment,
@@ -35,6 +36,9 @@ function CommentButtonContext({ photoId }) {
 
       queryClient.invalidateQueries({
         queryKey: ["userPhotos"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["commentCount", userId],
       });
     },
   });
