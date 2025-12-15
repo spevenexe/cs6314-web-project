@@ -9,7 +9,7 @@ function SimplePhotos({ photos }) {
     <div>
       {photos.map((item, index) => (
         <Post
-          key={item._id || index}
+          key={item._id ?? index}
           file_name={item.file_name}
           date_time={item.date_time}
           comments={item.comments}

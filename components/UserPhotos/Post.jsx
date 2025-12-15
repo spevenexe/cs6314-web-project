@@ -18,7 +18,7 @@ function Post({ file_name, date_time, comments, photoId }) {
       <PostImage file_name={file_name} date_time={date_time} photoId={photoId} />
       {comments.map((item, index) => (
         <PostComment
-          key={item._id || index}
+          key={item._id ?? index}
           date_time={item.date_time}
           comment={item.comment}
           user={item.user}

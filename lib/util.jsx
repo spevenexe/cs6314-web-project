@@ -70,7 +70,7 @@ export function createCommentWithMentions(matches, nonMatches, isLink = true) {
   const arrMatches = [];
   for (const match of matches) {
     const formattedMention = `${match[1]}`;
-    if (isLink) arrMatches.push(<Link to={`/users/${match[2]}`}>{formattedMention}</Link>);
+    if (isLink) arrMatches.push(<Link key={match.index} to={`/users/${match[2]}`}>{formattedMention}</Link>);
     else arrMatches.push(<b to={`/users/${match[2]}`}>{formattedMention}</b>);
   }
 
